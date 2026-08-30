@@ -1,0 +1,4 @@
+- Orders with status "processing" are eligible for refund.
+- Orders with status "shipped" are not eligible for refund.
+- Duplicate refund requests are not allowed.
+- A refund request requires explicit user confirmation.
