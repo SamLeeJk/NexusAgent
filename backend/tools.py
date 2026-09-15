@@ -5,6 +5,7 @@ from data.orders import ORDERS
 from data.refunds import REFUND_REQUEST
 from langchain_core.tools import tool
 from langgraph.prebuilt import InjectedState
+from retrieval import search_policy
 
 
 @tool
@@ -22,17 +23,31 @@ def get_order_status(order_id: str) -> dict:
 
 #  检查退款政策
 @tool
-def check_refund_policy(status: str, order_id: str) -> dict:
-    """Check whether an order is eligible for a refund based on its current status."""
+def check_refund_policy(order_id: str) -> dict:
+    """Read the order and check refund eligibility using its stored status."""
+    order_id = order_id.strip()
+    order = ORDERS.get(order_id)
+    if order is None:
+        return {
+            "found": False,
+            "eligible": False,
+            "order_id": order_id,
+            "error": f"Order {order_id} was not found.",
+        }
+    status = order["status"]
     if status == "processing":
         return {
             "found": True,
+            "order_id": order_id,
+            "status": status,
             "eligible": True,
             "reason": f"Order with status '{status}' is eligible for a refund.",
         }
     if status == "shipped":
         return {
             "found": True,
+            "order_id": order_id,
+            "status": status,
             "eligible": False,
             "reason": f"Order with status '{status}' is not eligible for a refund.",
         }
@@ -40,6 +55,7 @@ def check_refund_policy(status: str, order_id: str) -> dict:
         "found": True,
         "eligible": False,
         "order_id": order_id,
+        "status": status,
         "reason": f"Order {order_id} has unsupported status: {status}.",
     }
 
@@ -55,9 +71,6 @@ def create_refund_request(
     )  # Normalize the order ID to ensure consistent lookup
     order = ORDERS.get(normalized_order_id)
     is_requested = REFUND_REQUEST.get(normalized_order_id)
-    print("REFUND_REQUEST before =", REFUND_REQUEST)
-    print("object id =", id(REFUND_REQUEST))
-    print("is_requested =", is_requested)
     if not refund_confirmed:
         return {
             "success": False,
@@ -82,8 +95,6 @@ def create_refund_request(
             "order_id": normalized_order_id,
             "status": "requested",
         }
-        print("REFUND_REQUEST after =", REFUND_REQUEST)
-        print("object id =", id(REFUND_REQUEST))
         return {
             "success": True,
             "order_id": normalized_order_id,
@@ -95,13 +106,11 @@ def create_refund_request(
         "error": f"Order {normalized_order_id} is not eligible for a refund.",
     }
 
-POLICY_PATH=Path(__file__).parent / "data" / "knowledge"/ "refund_policy.md"
+
+POLICY_PATH = Path(__file__).parent / "data" / "knowledge" / "refund_policy.md"
+
+
 @tool
-def search_refund_policy(query:str)->dict:
-    """Search for refund policy information based on a query."""
-    with open(POLICY_PATH, "r", encoding="utf-8") as file:
-        policy_text = file.read()
-    return{
-        "query": query,
-        "policy_text": policy_text,
-    }
+def search_refund_policy(query: str) -> dict:
+    """Retrieve policy excerpts with source lines, or report no lexical match."""
+    return search_policy(POLICY_PATH, query)

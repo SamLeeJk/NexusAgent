@@ -19,3 +19,10 @@ httpx==0.28.1
 pytest==9.1.1
 pytest-asyncio==1.4.0
 ruff==0.16.5
+
+# Persistent business state and LangGraph checkpoints
+SQLAlchemy==2.0.52
+psycopg[binary]==3.3.5
+langgraph-checkpoint-postgres==3.1.2
+langgraph-checkpoint-sqlite==3.1.1
+filelock==3.32.4

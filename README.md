@@ -1,211 +1,111 @@
 # NexusAgent
 
-An AI customer-support agent built with **FastAPI**, **LangGraph**, and **OpenAI**.
+A full-stack customer-support demo with **React / TypeScript, FastAPI, PostgreSQL and LangGraph**. Customers can look up their orders, ask about policy, create an order-bound refund proposal, and explicitly approve or reject it. Conversations, pending approvals and refund receipts survive application restarts.
 
-NexusAgent is a learning-and-portfolio project focused on a **safe, extensible agent workflow**: the model can choose tools, but **deterministic Python** decides whether a business action is allowed. Current scenarios include order lookup, refund eligibility, refund request creation, and policy Q&A grounded in a local markdown document.
+The application creates **refund requests**, not financial transfers. It is a portfolio project using seeded users and simulated orders.
 
-RAG, a vector database, session memory, and human-in-the-loop interrupts are **planned**, not implemented.
-
----
-
-## Key features (implemented)
-
-- FastAPI `POST /chat` with Swagger UI (`/docs`)
-- Single LangGraph agent loop with tool calling
-- OpenAI chat model for reasoning and tool selection
-- Structured output to classify refund confirmation
-- LangGraph `InjectedState` so refund confirmation is not an LLM-supplied tool argument
-- Tool-level guardrails (order exists, eligibility, duplicate refund, user confirmation)
-- In-memory mock orders and refund requests
-- Local markdown refund policy as the first knowledge source
-- Server-side debug tracing of graph messages
-
-## Not implemented yet
-
-Vector search, hybrid RAG, BM25 retrieval, Qdrant usage, persistent DB, cross-request memory, HITL interrupt/resume, and SSE streaming. Related packages (for example `qdrant-client`, `rank-bm25`, `sse-starlette`) may be installed for later stages; they are **not** used in the current agent path.
-
----
-
-## Architecture
-
-```
-Client  →  FastAPI /chat  →  LangGraph  →  OpenAI (reason + tools)
-                                  ↓
-                         ToolNode (Python)
-                                  ↓
-                    mock orders / refunds / policy.md
-```
-
-| Layer | Role |
-| --- | --- |
-| FastAPI | HTTP API; invokes the compiled graph; prints a debug transcript of messages |
-| LangGraph | Workflow: confirmation → agent → (tools ↔ agent) → end |
-| OpenAI | Tool selection, natural-language answers, structured confirmation classification |
-| LangChain tools | Business actions (`get_order_status`, refund checks, create refund, policy read) |
-| `AgentState` | Message history plus `refund_confirmed` for one request |
-| Mock data | In-memory `ORDERS` and `REFUND_REQUEST` |
-| Policy file | `backend/data/knowledge/refund_policy.md` |
-
----
-
-## Current agent workflow
-
-```
-START
-  → confirmation   # structured bool: did this user message authorize a refund?
-  → agent          # LLM + bound tools
-  → tools?         # LangGraph tools_condition
-       yes → ToolNode → agent
-       no  → END
-```
-
-- Recursion is capped (`RECURSION_LIMIT = 10`) so a tool loop cannot run forever.
-- Each HTTP request starts a **new** graph state (`messages` + `refund_confirmed=False`). There is no checkpointer and no session across requests.
-
----
-
-## Tools
-
-| Tool | What it does |
-| --- | --- |
-| `get_order_status` | Looks up mock order `O1001` (shipped) or `O1002` (processing). Unknown IDs return not-found. |
-| `check_refund_policy` | Eligibility from status: `processing` eligible, `shipped` not eligible. |
-| `create_refund_request` | Creates an in-memory refund **only** if confirmation, order, uniqueness, and status checks pass. |
-| `search_refund_policy` | Reads the local refund policy markdown and returns it with the query. No chunking or ranking yet. |
-
----
-
-## Safety / guardrails
-
-The LLM may **request** `create_refund_request`. Python **enforces** whether it succeeds.
-
-1. **Confirmation is not a model argument.** `refund_confirmed` is set by a dedicated structured-output classifier, stored on `AgentState`, and injected into the tool with LangGraph `InjectedState`. The model cannot pass `refund_confirmed=true` in the tool call.
-2. **Eligibility** is re-checked in Python (`processing` only).
-3. **Duplicates** are blocked via in-memory `REFUND_REQUEST`.
-4. **Missing orders** return a structured error instead of creating a refund.
-
-Questions about policy or eligibility are treated as **not** confirmation.
-
----
-
-## Project structure
-
-```
-NexusAgent/
-├── LICENSE
-├── README.md
-└── backend/
-    ├── main.py                 # FastAPI app, POST /chat
-    ├── agent.py                # LangGraph graph, LLM, confirmation node
-    ├── state.py                # AgentState (messages + refund_confirmed)
-    ├── tools.py                # LangChain tools + InjectedState
-    ├── requirements.txt
-    ├── docker-compose.yml      # Qdrant ports 6333/6334 (not used by the agent yet)
-    └── data/
-        ├── orders.py           # Mock orders
-        ├── refunds.py          # In-memory refund store
-        ├── confirm.py
-        └── knowledge/
-            └── refund_policy.md
-```
-
----
-
-## Setup
-
-Requirements: **Python 3.12**, pip, an OpenAI API key.
+## Run the full stack
 
 ```bash
-cd backend
-python -m venv .venv
-
-# Windows
-.venv\Scripts\activate
-
-# macOS / Linux
-source .venv/bin/activate
-
-pip install -r requirements.txt
+docker compose -p nexusagent-stage2 -f backend/docker-compose.yml up --build -d app
 ```
 
-Create `backend/.env` (do not commit secrets):
+Open [the local workspace](http://127.0.0.1:8000). Demo accounts:
 
-```env
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
+- `alice` / `demo-alice-123`: O1001 (shipped), O1002 (processing).
+- `bob` / `demo-bob-123`: O2001 (processing).
+
+Compose explicitly enables the **deterministic rule demo**, so it does not require or call an external model. The UI labels this mode. PostgreSQL is exposed on loopback port `55432`; the application binds loopback port `8000`. Set `NEXUS_HTTP_PORT` before running Compose if that HTTP port is occupied.
+
+Ask “O1002 能退款吗？”, then “帮我申请”. Refresh the page while the confirmation card is pending, approve it, and inspect the saved receipt. Repeated approvals return the same result. Existing seed records and receipts are not reset on startup.
+
+## Implemented
+
+- Login with hashed passwords, expiring opaque sessions and HttpOnly / SameSite cookies.
+- User ownership checks on orders, conversations, proposals and their results.
+- Persistent conversation history and LangGraph checkpoints.
+- Explicit order-bound proposals with a 15-minute expiry and separate approval/rejection API.
+- Durable `interrupt` / `Command(resume=...)` workflow; model text is never approval.
+- Transactional refund request creation, order uniqueness, idempotent request IDs and receipt recovery.
+- Cross-process conversation locking; execution rechecks the latest order state and ownership.
+- English BM25 policy retrieval with source lines, content versions and no-match handling.
+- React chat, saved conversation navigation, confirmation cards, error recovery and mobile layout.
+- Offline and PostgreSQL integration tests, browser end-to-end tests, and opt-in live-model smoke test.
+
+## Runtime architecture
+
+```text
+React UI → authenticated FastAPI → SupportService → LangGraph + durable checkpoints
+                                     │              understand → resolve
+                                     │                  ↓ proposal
+                                     │              approval (interrupt)
+                                     │                  ↓ authenticated decision
+                                     └────────────── execute → saved receipt
+                                                      │
+                                                  PostgreSQL
 ```
 
-`OPENAI_MODEL` is optional and defaults to `gpt-4o-mini`.
+The model classifies intent and resolves conversational references. Business nodes retrieve authoritative data, create proposals and enforce execution rules. The runtime does not let a model supply its own approval. Approval decisions, business writes and checkpoint updates are separate commits; persistent receipts and idempotent retries reconcile interruption between them.
 
----
+The original `agent.py`, `tools.py`, `state.py` and in-memory data modules remain as **stage-one experiments**, not the active web execution path. The old anonymous `POST /chat` returns 410.
 
-## Run
+## Local development
 
-From `backend/` with the venv active:
+Use Python 3.12 and a working virtual environment:
 
 ```bash
-uvicorn main:app --reload --host 127.0.0.1 --port 8000
+pip install -r backend/requirements.txt
+cd frontend
+npm ci
+npm run build
 ```
 
-- API: `http://127.0.0.1:8000/chat`
-- Swagger: `http://127.0.0.1:8000/docs`
-
-If `OPENAI_API_KEY` is missing, `/chat` returns **503**.
-
-Optional: `docker compose -f backend/docker-compose.yml up` starts a local Qdrant for later RAG work. The current agent does not call it.
-
----
-
-## Example requests
+Start PostgreSQL using the Compose `postgres` service. Configure `backend/.env` using `backend/.env.example`. From `backend/`, run:
 
 ```bash
-curl -X POST http://127.0.0.1:8000/chat \
-  -H "Content-Type: application/json" \
-  -d "{\"message\": \"What is the status of order O1001?\"}"
+python migrate.py
+uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-```json
-{ "message": "Is order O1002 eligible for a refund?" }
+Alternatively, `python run_local.py` explicitly runs a file-backed SQLite / rule demo, storing data under `backend/runtime/`. It does not replace PostgreSQL by default and is not a PostgreSQL validation substitute.
+
+To use a live model, set `NEXUS_DEMO_MODE=false`, configure `OPENAI_API_KEY` and optionally `OPENAI_MODEL`, then restart. Only enable real external calls when approved for the data involved. The default model name is `gpt-4o-mini`. Compose does not copy or automatically mount `.env` secrets into its image.
+
+## API
+
+Write requests require the `X-Nexus-Request: 1` header. Sign in using `POST /api/login`, then retain the session cookie.
+
+- `GET /api/me`, `POST /api/logout`
+- `GET /api/orders`, `GET /api/orders/{order_id}`
+- `POST /api/conversations`, `GET /api/conversations`
+- `GET /api/conversations/{cid}`
+- `POST /api/conversations/{cid}/messages` with `{ "request_id": "UUID", "message": "..." }`
+- `POST /api/conversations/{cid}/proposals/{pid}/decision` with `{ "decision": "approve" }` or `reject`
+- `GET /api/health`
+
+Preserve request IDs on retries. HTTP 200 may represent an expired, rejected or invalidated proposal; inspect the business state. Only a completed proposal and saved refund request indicate successful registration.
+
+## Verification
+
+From the repository root with development dependencies installed:
+
+```bash
+python -m pytest backend/tests -q
+python -m ruff check backend
 ```
 
-```json
-{ "message": "Please create a refund for order O1002." }
-```
+Set `NEXUS_TEST_DATABASE_URL` to a **dedicated PostgreSQL test database** to run `backend/tests/test_support.py` against PostgreSQL. Tests create and remove their own random schemas. Without it, tests use temporary SQLite databases. Live-model tests are skipped unless `NEXUS_LIVE_EVAL=1` is explicitly enabled.
 
-```json
-{ "message": "What is the refund policy for shipped orders?" }
-```
+With the demo server running at port 8000, run `npm run test:e2e` in `frontend/`. This uses installed Chrome and writes only to demo accounts. Build with `npm run build` to check TypeScript and generate frontend assets.
 
-`POST /chat` currently returns a **debug transcript** of graph messages (user turn, tool calls, tool results, final model text), not a production chat payload.
+## Scope and next work
 
-Mock data: **O1001** shipped / not refundable; **O1002** processing / refundable.
+No payment gateway, production identity lifecycle, SSE, vector/hybrid search, admin console or load certification is included. Authentication and rule-based demo mode are suitable for the local portfolio environment, not an assertion of production readiness.
 
----
+The next milestone is improved knowledge ingestion and retrieval evaluation, followed by streaming and operator handoff.
 
-## Roadmap
+- [Current progress](docs/PROGRESS.md)
+- [Deployment and acceptance walkthrough](docs/阶段2-验收与部署.md)
+- [Target-state project/resume material](docs/NexusAgent-项目完成形态与简历素材.md)
 
-1. Document chunking  
-2. Basic lexical retrieval  
-3. BM25 retrieval  
-4. Qdrant vector retrieval  
-5. Hybrid RAG  
-6. Reranking  
-7. Persistent database  
-8. Session memory / checkpointer  
-9. Human-in-the-loop interrupt and resume  
-10. SSE streaming  
-11. Evaluation dataset and agent eval harness  
-
----
-
-## Project status
-
-**Stage:** single-agent customer support with tool calling, confirmation classification, injected-state guardrails, and file-based policy grounding.
-
-**Not production-ready:** in-memory data, no auth, no durable sessions, debug-oriented `/chat` response.
-
----
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+MIT license; see [LICENSE](LICENSE).
