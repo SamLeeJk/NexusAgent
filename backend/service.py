@@ -43,7 +43,8 @@ class SupportService:
                     )
                 state = graph.get_state(config)
                 self.db.finish_turn(
-                    cid, turn["id"], state.values["reply"], waiting=bool(state.next)
+                    cid, turn["id"], state.values["reply"], waiting=bool(state.next),
+                    sources=state.values.get("sources", []),
                 )
             return self.db.snapshot(uid, cid)
 

@@ -8,6 +8,7 @@ from database import BusinessError, Database
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from knowledge import KnowledgeStore
 from langgraph.errors import GraphRecursionError
 from openai import OpenAIError
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -38,6 +39,25 @@ class MessageInput(BaseModel):
 class DecisionInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     decision: Literal["approve", "reject"]
+
+
+class KnowledgeInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    slug: str = Field(pattern=r"^[a-z0-9][a-z0-9-]{0,79}$")
+    title: str = Field(min_length=1, max_length=200)
+    content: str = Field(min_length=1, max_length=200000)
+
+
+class PublishInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    version_id: UUID
+    expected_active_version_id: UUID | None
+
+
+class SearchInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    query: str = Field(min_length=1, max_length=2000)
+    top_k: int = Field(default=3, ge=1, le=10)
 
 
 def create_app(config=None, db=None, model=None):
@@ -98,6 +118,38 @@ def create_app(config=None, db=None, model=None):
         )
 
     CurrentUser = Annotated[dict, Depends(current_user)]
+
+    def admin_user(user: CurrentUser):
+        if user["role"] != "admin":
+            raise HTTPException(403, "仅知识库管理员可以执行此操作。")
+        return user
+
+    AdminUser = Annotated[dict, Depends(admin_user)]
+
+    @app.get("/api/admin/knowledge/documents")
+    def knowledge_documents(request: Request, user: AdminUser):
+        return KnowledgeStore(request.app.state.db).list_documents(user["id"])
+
+    @app.post("/api/admin/knowledge/documents")
+    def import_knowledge(payload: KnowledgeInput, request: Request, user: AdminUser):
+        return KnowledgeStore(request.app.state.db).import_document(user["id"], payload.slug, payload.title, payload.content)
+
+    @app.get("/api/admin/knowledge/versions/{vid}")
+    def preview_knowledge(vid: UUID, request: Request, user: AdminUser):
+        return KnowledgeStore(request.app.state.db).preview(user["id"], str(vid))
+
+    @app.post("/api/admin/knowledge/documents/{did}/publish")
+    def publish_knowledge(did: UUID, payload: PublishInput, request: Request, user: AdminUser):
+        return KnowledgeStore(request.app.state.db).publish(user["id"], str(did), str(payload.version_id),
+            str(payload.expected_active_version_id) if payload.expected_active_version_id else None)
+
+    @app.post("/api/knowledge/search")
+    def search_knowledge(payload: SearchInput, request: Request, user: CurrentUser):
+        return KnowledgeStore(request.app.state.db).search(payload.query, payload.top_k)
+
+    @app.get("/api/knowledge/sources/{chunk_id}")
+    def knowledge_source(chunk_id: UUID, request: Request, user: CurrentUser):
+        return KnowledgeStore(request.app.state.db).source(str(chunk_id))
 
     @app.get("/api/health")
     def health(request: Request):

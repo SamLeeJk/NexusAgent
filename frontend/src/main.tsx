@@ -1,21 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
+import { api } from './api';
+import { KnowledgeManager } from './KnowledgeManager';
+import { SourceCards, type Source } from './SourceCards';
 
-type User = { id: string; username: string };
+type User = { id: string; username: string; role: string };
 type Conversation = { id: string; created_at: number };
 type Proposal = { id: string; order_id: string; status: string; expires_at: number; decision: 'approve' | 'reject' | null; result: string | null };
 type Turn = { request_id: string; content: string; status: string };
-type Snapshot = { id: string; messages: { id: string; role: string; content: string }[]; proposals: Proposal[]; refunds: { id: string; order_id: string; status: string }[]; turns: Turn[] };
+type Snapshot = { id: string; messages: { id: string; role: string; content: string; sources?: Source[] }[]; proposals: Proposal[]; refunds: { id: string; order_id: string; status: string }[]; turns: Turn[] };
 const statusName: Record<string, string> = { pending: '等待确认', approved: '正在恢复申请', completed: '已登记', rejected: '已取消', expired: '已过期', invalidated: '条件已变化' };
 
-async function api<T>(path: string, body?: unknown): Promise<T> {
-  const res = await fetch('/api' + path, { credentials: 'same-origin', method: body === undefined ? 'GET' : 'POST', headers: { 'Content-Type': 'application/json', 'X-Nexus-Request': '1' }, body: body === undefined ? undefined : JSON.stringify(body) });
-  if (!res.ok) { const error = await res.json().catch(() => ({})); throw new Error(typeof error.detail === 'string' ? error.detail : `请求失败 (${res.status})`); }
-  return res.json();
-}
-
 function App() {
+  const [page, setPage] = useState<'chat' | 'knowledge'>('chat');
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [health, setHealth] = useState({mode: '', storage: ''});
@@ -84,15 +82,17 @@ function App() {
       {health.mode === 'demo' && <p className="demo-note">当前为规则演示模式，不调用真实模型。已初始化演示数据时可使用 alice / demo-alice-123。</p>}
     </form>
   </main>;
+  if (page === 'knowledge' && user.role === 'admin') return <KnowledgeManager onBack={()=>setPage('chat')} />;
   return <div className="workspace">
     <aside className="sidebar"><div className="brand">N / NexusAgent</div><p className="eyebrow">售后工作台</p><button className="primary" disabled={busy} onClick={()=>void run(newChat)}>＋ 新建会话</button>
+      {user.role==='admin' && <button className="knowledge-entry" disabled={busy} onClick={()=>setPage('knowledge')}>知识库管理</button>}
       <nav aria-label="会话列表">{conversations.map((c,i)=><button key={c.id} disabled={busy} className={snapshot?.id===c.id?'selected':''} onClick={()=>void run(()=>open(c.id))}><span>售后咨询 {conversations.length-i}</span><small>{new Date(c.created_at*1000).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</small></button>)}</nav>
       <div className="account"><span>{user.username}</span><button disabled={busy} onClick={()=>void run(async()=>{await api('/logout',{}); setUser(null); setSnapshot(null); setRetry(null); setText(''); sessionStorage.removeItem('nexus.conversation');})}>退出</button></div>
     </aside>
     <main className="chat"><header><div><p className="eyebrow">SUPPORT CONVERSATION</p><h1>订单与退款咨询</h1></div><span className="badge">{health.mode==='demo'?'规则演示':'AI 模型'} · 会话已保存</span></header>
       <div className="messages" aria-live="polite">
         {!snapshot?.messages.length && <section className="welcome"><span className="welcome-mark">N</span><h2>我们从哪张订单开始？</h2><p>你可以先询问退款资格。只有确认具体订单后，才会提交申请。</p><button disabled={busy} onClick={()=>void run(async()=>{if(!snapshot) await newChat(); setText('O1002 能退款吗？');})}>试试：O1002 能退款吗？</button></section>}
-        {snapshot?.messages.map(m=><article key={m.id} className={`message ${m.role}`}><span className="speaker">{m.role==='user'?'你':'NexusAgent'}</span><p>{m.content}</p></article>)}
+        {snapshot?.messages.map(m=><article key={m.id} className={`message ${m.role}`}><span className="speaker">{m.role==='user'?'你':'NexusAgent'}</span><p>{m.content}</p><SourceCards sources={m.sources ?? []}/></article>)}
         {snapshot?.proposals.map(p=><section className="proposal" key={p.id} aria-label={`订单 ${p.order_id} 确认卡`}><div className="proposal-head"><span className="eyebrow">退款申请</span><span className="badge">{statusName[p.status]??p.status}</span></div><h3>订单 {p.order_id}</h3><p>{p.result?'处理结果已保存，可以在此查看。':'将创建一条退款申请，不会直接执行资金退款。'}</p><small>确认有效期至 {new Date(p.expires_at*1000).toLocaleString('zh-CN')}</small>
           {!p.result && <div className="actions"><button className="primary" disabled={busy || p.decision==='reject'} onClick={()=>void run(()=>decide(p,'approve'))}>{p.decision==='approve'?'恢复已确认申请':'确认申请'}</button><button disabled={busy || p.decision==='approve'} onClick={()=>void run(()=>decide(p,'reject'))}>{p.decision==='reject'?'恢复取消结果':'取消'}</button></div>}
           {p.result && <p className="result">{p.result}</p>}

@@ -10,6 +10,7 @@ from uuid import NAMESPACE_URL, uuid4, uuid5
 
 from filelock import FileLock, Timeout
 from sqlalchemy import (
+    JSON,
     Column,
     Float,
     ForeignKey,
@@ -21,6 +22,7 @@ from sqlalchemy import (
     UniqueConstraint,
     create_engine,
     event,
+    inspect,
     select,
     text,
 )
@@ -35,6 +37,7 @@ users = Table(
     Column("id", String(36), primary_key=True),
     Column("username", String(80), unique=True, nullable=False),
     Column("password_hash", String(200), nullable=False),
+    Column("role", String(20), nullable=False, server_default="customer"),
 )
 sessions = Table(
     "sessions",
@@ -79,6 +82,7 @@ messages = Table(
     Column("content", Text, nullable=False),
     Column("created_at", Float, nullable=False),
     UniqueConstraint("turn_id", "kind"),
+    Column("sources", JSON, nullable=False, server_default="[]"),
 )
 proposals = Table(
     "proposals",
@@ -180,20 +184,30 @@ class Database:
 
     def migrate(self):
         with self.lock("schema-migration"), self.engine.begin() as conn:
-            # Migration 001: initial schema. Later schema changes require a new revision.
+            # Fresh installs create the latest shape; existing installations use
+            # explicit additive migrations, preserving users, receipts and history.
             metadata.create_all(conn)
             if not row(conn, versions, versions.c.version == 1):
                 conn.execute(versions.insert().values(version=1))
+            if not row(conn, versions, versions.c.version == 2):
+                if "role" not in {c["name"] for c in inspect(conn).get_columns("users")}:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'customer'"))
+                if "sources" not in {c["name"] for c in inspect(conn).get_columns("messages")}:
+                    conn.execute(text("ALTER TABLE messages ADD COLUMN sources JSON NOT NULL DEFAULT '[]'"))
+                from knowledge import knowledge_metadata
+                knowledge_metadata.create_all(conn)
+                conn.execute(versions.insert().values(version=2))
 
     def seed_demo(self):
         with self.lock("seed-demo"), self.engine.begin() as conn:
-            for username in ("alice", "bob"):
+            for username in ("alice", "bob", "admin"):
                 if not row(conn, users, users.c.username == username):
                     conn.execute(
                         users.insert().values(
                             id=username,
                             username=username,
                             password_hash=password_hash(f"demo-{username}-123"),
+                            role="admin" if username == "admin" else "customer",
                         )
                     )
             for oid, uid, status in (
@@ -205,6 +219,8 @@ class Database:
                     conn.execute(
                         orders.insert().values(id=oid, user_id=uid, status=status)
                     )
+        from knowledge import KnowledgeStore
+        KnowledgeStore(self).seed_demo()
 
     def login(self, username, password):
         with self.engine.begin() as conn:
@@ -225,7 +241,7 @@ class Database:
                     expires_at=time.time() + 86400,
                 )
             )
-            return token, {"id": user["id"], "username": user["username"]}
+            return token, {"id": user["id"], "username": user["username"], "role": user["role"]}
 
     def authenticate(self, token):
         with self.engine.connect() as conn:
@@ -237,7 +253,7 @@ class Database:
             if not session or session["expires_at"] <= time.time():
                 raise BusinessError(401, "请先登录。")
             user = row(conn, users, users.c.id == session["user_id"])
-            return {"id": user["id"], "username": user["username"]}
+            return {"id": user["id"], "username": user["username"], "role": user["role"]}
 
     def logout(self, token):
         with self.engine.begin() as conn:
@@ -316,7 +332,7 @@ class Database:
             return result
 
     @staticmethod
-    def message(conn, cid, tid, kind, content):
+    def message(conn, cid, tid, kind, content, sources=None):
         if not row(
             conn, messages, (messages.c.turn_id == tid) & (messages.c.kind == kind)
         ):
@@ -328,6 +344,7 @@ class Database:
                     kind=kind,
                     role="user" if kind == "user" else "assistant",
                     content=content,
+                    sources=sources or [],
                     created_at=time.time(),
                 )
             )
@@ -363,14 +380,14 @@ class Database:
             self.message(conn, cid, value["id"], "user", content)
             return value
 
-    def finish_turn(self, cid, tid, reply, waiting=False, decision=False):
+    def finish_turn(self, cid, tid, reply, waiting=False, decision=False, sources=None):
         with self.engine.begin() as conn:
             conn.execute(
                 turns.update()
                 .where(turns.c.id == tid)
                 .values(status="waiting" if waiting else "completed")
             )
-            self.message(conn, cid, tid, "decision" if decision else "reply", reply)
+            self.message(conn, cid, tid, "decision" if decision else "reply", reply, sources)
 
     def propose(self, uid, cid, tid, oid, ttl):
         pid = str(uuid5(NAMESPACE_URL, "nexus-refund:" + tid))
