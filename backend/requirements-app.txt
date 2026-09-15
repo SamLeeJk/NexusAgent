@@ -1,0 +1,14 @@
+# Runtime for the persistent support app (no unused embedding/torch dependencies).
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+langgraph==1.2.11
+langchain-openai==1.6.0
+langchain-core==1.6.1
+rank-bm25==0.2.2
+pydantic==2.13.5
+python-dotenv==1.2.3
+SQLAlchemy==2.0.52
+psycopg[binary]==3.3.5
+langgraph-checkpoint-postgres==3.1.2
+langgraph-checkpoint-sqlite==3.1.1
+filelock==3.32.4

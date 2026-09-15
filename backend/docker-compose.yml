@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: nexus
+      POSTGRES_PASSWORD: nexus_local
+      POSTGRES_DB: nexus
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus -d nexus"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  app:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    ports:
+      - "127.0.0.1:${NEXUS_HTTP_PORT:-8000}:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://nexus:nexus_local@postgres:5432/nexus
+      NEXUS_DEMO_MODE: "true"
+      NEXUS_SEED_DEMO: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  qdrant:
+    profiles: ["search"]
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+volumes:
+  postgres_data:
+  qdrant_storage:
