@@ -1,6 +1,16 @@
 # NexusAgent 开发进度
 
-更新日期：2026-09-16。
+更新日期：2026-09-17。
+
+## P0：可观测性垂直切片
+
+已实现环境变量开关控制的 OpenTelemetry 请求、四个 LangGraph 节点、知识检索和关键数据库方法 Span；Prometheus HTTP RED、节点/数据库操作、Agent 结果和检索指标；白名单结构化日志，不采集请求正文、Cookie、Prompt、SQL 参数或异常原文。正常 interrupt 标记 waiting，恢复请求通过 conversation_id/turn_id 关联，不向 checkpoint 添加 Trace 状态。
+
+Compose 新增独立 observability profile，包含 OTel Collector、Jaeger、Prometheus 与 Grafana，以及自动预置/可导入的十面板 Dashboard。监控默认关闭，测试采用内存 exporter 和独立 registry，不依赖监控服务。
+
+实际验证：全部后端 75 通过、1 跳过；PostgreSQL 专项 48 通过、1 跳过；前端构建通过；启用遥测的 Docker 实例浏览器 4 项通过。真实模型项继续跳过，没有外部模型调用。完整监控栈已启动，实际查询确认 Jaeger Trace、Prometheus 抓取和 Grafana Dashboard。
+
+受控 understand 故障返回 500 并生成错误 Span；关闭故障、重启应用后原 request_id 恢复成功，只有一个 turn、两条消息，无退款申请。Collector 停止时知识检索仍返回 200，之后已恢复 Collector。现有确认、事务、幂等与 checkpoint 路径保留；没有实现 SSE、Qdrant 或向量里程碑。详见 [验收记录](P0-可观测性验收.md) 与 README 的启动/故障演示步骤。
 
 ## 阶段 3A：版本化知识库与检索验收
 

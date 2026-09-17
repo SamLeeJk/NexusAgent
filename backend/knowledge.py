@@ -21,6 +21,8 @@ from sqlalchemy import (
     select,
 )
 
+from observability import observed
+
 knowledge_metadata = MetaData()
 documents = Table(
     "knowledge_documents",
@@ -258,6 +260,7 @@ class KnowledgeStore:
             documents.c.active_version_id,
         ).select_from(chunks.join(revisions).join(documents))
 
+    @observed("db.knowledge.active_chunks", "database")
     def active_chunks(self):
         with self.db.engine.connect() as conn:
             # One statement takes a coherent view of publication pointers and content.
@@ -270,6 +273,7 @@ class KnowledgeStore:
                 ).mappings()
             ]
 
+    @observed("knowledge.search", "retrieval")
     def search(self, query, top_k=3):
         return rank_chunks(self.active_chunks(), query, top_k)
 

@@ -24,9 +24,52 @@ services:
       DATABASE_URL: postgresql+psycopg://nexus:nexus_local@postgres:5432/nexus
       NEXUS_DEMO_MODE: "true"
       NEXUS_SEED_DEMO: "true"
+      NEXUS_OBSERVABILITY_ENABLED: "${NEXUS_OBSERVABILITY_ENABLED:-false}"
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:-http://otel-collector:4318/v1/traces}"
+      NEXUS_OBS_FAULT_NODE: "${NEXUS_OBS_FAULT_NODE:-}"
     depends_on:
       postgres:
         condition: service_healthy
+  otel-collector:
+    profiles: ["observability"]
+    image: otel/opentelemetry-collector-contrib:0.136.0
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ../observability/collector.yaml:/etc/otelcol/config.yaml:ro
+    depends_on:
+      - jaeger
+  jaeger:
+    profiles: ["observability"]
+    image: jaegertracing/jaeger:2.11.0
+    ports:
+      - "127.0.0.1:16686:16686"
+  prometheus:
+    profiles: ["observability"]
+    image: prom/prometheus:v3.7.1
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=7d"]
+    volumes:
+      - ../observability/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+  grafana:
+    profiles: ["observability"]
+    image: grafana/grafana:12.2.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: "${NEXUS_GRAFANA_PASSWORD:-nexus-local-demo}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - ../observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - prometheus
+      - jaeger
   qdrant:
     profiles: ["search"]
     image: qdrant/qdrant:latest
@@ -39,3 +82,5 @@ services:
 volumes:
   postgres_data:
   qdrant_storage:
+  prometheus_data:
+  grafana_data:

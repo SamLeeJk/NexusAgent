@@ -108,6 +108,92 @@ Set `NEXUS_TEST_DATABASE_URL` to a **dedicated PostgreSQL test database** to run
 
 With the demo server running at port 8000, run `npm run test:e2e` in `frontend/`. This uses installed Chrome and writes only to demo accounts. Build with `npm run build` to check TypeScript and generate frontend assets.
 
+## P0 observability (opt-in)
+
+This slice adds OpenTelemetry request/node/retrieval/database spans, Prometheus RED and Agent metrics, and allowlisted JSON logs. It does not change approval, transaction, idempotency or checkpoint rules. No SSE or vector milestone is included.
+
+From the repository root in PowerShell:
+
+```powershell
+$env:NEXUS_HTTP_PORT='8001'
+$env:NEXUS_OBSERVABILITY_ENABLED='true'
+docker compose -p nexusagent-stage2 -f backend/docker-compose.yml --profile observability up --build -d app otel-collector jaeger prometheus grafana
+```
+
+The app remains at http://127.0.0.1:8001; `/metrics` is exposed only when enabled. Open [Jaeger](http://127.0.0.1:16686) and select service `nexusagent`, [Prometheus targets](http://127.0.0.1:9090/targets), and [Grafana dashboard](http://127.0.0.1:3000/d/nexusagent-p0). Grafana's local demo login is `admin / nexus-local-demo`; set `NEXUS_GRAFANA_PASSWORD` before the first start to use another password. Existing Grafana volumes retain their previously initialized password.
+
+Compose sends spans over internal OTLP/HTTP to Collector, then Jaeger. Prometheus scrapes the app directly. Grafana provisions both data sources and ten dashboard panels. All published ports are loopback-only; Collector's ingest port is internal. These components are a local demo, not a hardened production monitoring deployment. Jaeger storage is in-memory; Prometheus keeps seven days in its volume.
+
+The [dashboard JSON](observability/grafana/dashboards/nexusagent.json) is also importable via Grafana **Dashboards → New → Import**. Choose your Prometheus data source using the dashboard's `Prometheus` selector; the provisioned instance chooses `nexus-prometheus`. A direct Jaeger link uses the local port above.
+
+Configuration:
+
+- `NEXUS_OBSERVABILITY_ENABLED=false` by default: no exporter, spans, metrics endpoint or structured telemetry records are created. Explicit test `Config` objects remain disabled unless the test opts in.
+- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`: full HTTP endpoint, e.g. `http://otel-collector:4318/v1/traces`. An empty endpoint enables local metrics/logs and spans without exporting. Outside Docker, use an endpoint reachable by that process.
+- `NEXUS_OBS_FAULT_NODE=understand`: deterministic fault at node entry, active only with observability enabled and `NEXUS_DEMO_MODE=true`. Leave empty normally; no request header can enable it.
+
+The server accepts valid W3C `traceparent`, returns `X-Trace-ID`, and propagates context into sync handlers and graph nodes. Resuming an approval creates a new request trace, correlated by `conversation_id` and `turn_id`; trace state is never added to checkpoints. Message `request_id` is the client's idempotency UUID; other requests get a generated correlation UUID. Unknown IDs remain empty in logs.
+
+Log fields are `trace_id`, `conversation_id`, `turn_id`, `request_id`, `node`, `status`, `error_type`. Only validated UUIDs and controlled operation/error categories are recorded. Passwords, Cookie/Authorization headers, raw URLs/query strings, model prompts, answers, knowledge bodies, SQL parameters, exception messages/stacks and baggage are excluded rather than regex-redacted after collection. Unexpected request exceptions produce a generic 500; nodes keep their original exceptions for graph failure/retry. Container access logs are disabled to avoid query-string logging. For local Uvicorn use `--no-access-log` too. Do not enable third-party debug/body logging when checking this guarantee.
+
+Metrics use bounded labels; no user/conversation/turn/request/trace ID is a metric label:
+
+- `nexus_http_requests_total{method,route,status_code}` and `nexus_http_request_duration_seconds{method,route}`: HTTP rate, status-based error rate and duration. Route templates replace IDs; unknown routes and early CSRF rejection use `unmatched`; `/metrics` itself is excluded.
+- `nexus_operations_total{category,operation,status}` and `nexus_operation_duration_seconds{category,operation}`: graph nodes and database/service/retrieval operation attempts. Approval interrupt is `waiting`, not `error`.
+- `nexus_agent_outcomes_total{action,outcome}`: completed/waiting/replay/error sends and decision outcomes, including rejected, expired and invalidated proposals.
+- `nexus_retrieval_total{outcome}`: found/no_match/error retrievals.
+
+Counters count attempts and response outcomes, **not unique refund transactions**; retries are explicitly counted. Database spans wrap business methods, including commit, rather than exporting individual SQL. This P0 uses one app worker and process-local counters (reset on restart). Multi-worker metrics aggregation, durable trace storage, log search and production alerting are outside this slice. Trace export uses a bounded asynchronous batch queue and a two-second exporter timeout; an unavailable Collector must not become a business dependency. Export failures can lose telemetry. Structured logs are available through `docker compose ... logs app`; no log storage service was added.
+
+### Demo and acceptance
+
+1. Wait for `/api/health` to return `mode=demo`, `storage=postgresql` and for the Prometheus target to be UP.
+2. Sign in as `alice`, start a conversation and ask `确认有效期政策`. Use the response's `X-Trace-ID` in Jaeger to inspect `agent.send → agent.understand / agent.resolve → knowledge.search → db.knowledge.active_chunks`.
+3. Send `帮我申请 O1002`, then explicitly confirm or cancel. Check `agent.approval` with `nexus.status=waiting`, followed by a separate resume request with `agent.approval`, `agent.execute` and `db.execute`. Repeat the same decision to inspect a `replay` outcome.
+4. Run the automated local-stack smoke test (it creates a synthetic conversation and **cancels** its proposal):
+
+```powershell
+python backend/observability_smoke.py --base-url http://127.0.0.1:8001
+```
+
+It checks actual Jaeger spans, Prometheus UP/metrics, Grafana's ten panels and all their PromQL expressions. Non-sensitive IDs and results are written to ignored `backend/runtime/observability-smoke.json`. It refuses a non-demo model mode.
+
+### Fault injection and recovery
+
+With the same HTTP port and observability environment variables still set:
+
+```powershell
+$env:NEXUS_OBS_FAULT_NODE='understand'
+docker compose -p nexusagent-stage2 -f backend/docker-compose.yml --profile observability up -d --no-build app
+```
+
+Wait for app health, start a new customer conversation and send a policy question. The response is 500; `agent.understand`, `agent.send` and its server span have `error.type=InjectedFailure`. The node error counter and HTTP 5xx series increase. Keep the original conversation/request UUID (the UI retains it behind **重试原消息（保持请求编号）**). The failure happens before understanding or any refund action.
+
+Disable the fault immediately after observing it:
+
+```powershell
+$env:NEXUS_OBS_FAULT_NODE=''
+docker compose -p nexusagent-stage2 -f backend/docker-compose.yml --profile observability up -d --no-build app
+```
+
+Wait for health, then click the retry button **without refreshing the page**, or resend the same message with its original `request_id` to the original conversation endpoint. The same persisted turn resumes; no duplicate user message or business action is required. Metrics reset on app recreation, so use a Grafana time range including the failure; Jaeger keeps the error trace until its own restart. Do not run startup fault demonstrations concurrently with PostgreSQL tests against the same database: their existing advisory migration locks are shared even across test schemas.
+
+To demonstrate exporter independence, stop only Collector, send another policy question, then start Collector again. The request should still succeed; a sufficiently long outage may drop queued spans. To disable observability entirely, set `NEXUS_OBSERVABILITY_ENABLED=false` and recreate app. Stop monitoring services explicitly if desired; omitting the Compose profile does not stop containers already running.
+
+### Automated checks
+
+```powershell
+python -m pytest backend/tests -q
+$env:NEXUS_TEST_DATABASE_URL='postgresql+psycopg://nexus:nexus_local@127.0.0.1:55432/nexus?connect_timeout=5'
+python -m pytest backend/tests/test_support.py backend/tests/test_knowledge.py backend/tests/test_observability.py -q
+Remove-Item Env:NEXUS_TEST_DATABASE_URL
+npm --prefix frontend run build
+```
+
+Observability tests use in-memory span exporters and per-app Prometheus registries; they require no Collector, Jaeger, Prometheus, Grafana or model service. They cover trace parentage, request isolation, RED labels, sensitive input/exception exclusion, normal interrupt, explicit decision/replay, fault recovery, logging sink failure, default-off behavior and independent app registries. PostgreSQL tests use random schemas; use a dedicated test database in shared environments. See [P0 acceptance record](docs/P0-可观测性验收.md) for the actual run results and limitations.
+
+Instrumentation follows [OpenTelemetry Python's manual instrumentation API](https://opentelemetry.io/docs/languages/python/instrumentation/), [Prometheus Python histograms](https://prometheus.github.io/client_python/instrumenting/histogram/) and [Grafana provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/).
+
 ## Scope and next work
 
 No payment gateway, production identity lifecycle, SSE, vector/hybrid search, full operator console or load certification is included. The knowledge admin page is implemented. Authentication and rule-based demo mode are suitable for the local portfolio environment, not an assertion of production readiness.

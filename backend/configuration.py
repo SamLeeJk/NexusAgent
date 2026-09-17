@@ -16,6 +16,9 @@ class Config:
     api_key: str = ""
     model: str = "gpt-4o-mini"
     proposal_ttl: int = 900
+    observability_enabled: bool = False
+    otel_endpoint: str = ""
+    observability_fault_node: str = ""
 
     @classmethod
     def environment(cls):
@@ -29,4 +32,7 @@ class Config:
             secure_cookie=os.getenv("NEXUS_SECURE_COOKIE", "false").lower() == "true",
             api_key=os.getenv("OPENAI_API_KEY", ""),
             model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            observability_enabled=os.getenv("NEXUS_OBSERVABILITY_ENABLED", "false").lower() == "true",
+            otel_endpoint=os.getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", ""),
+            observability_fault_node=os.getenv("NEXUS_OBS_FAULT_NODE", ""),
         )

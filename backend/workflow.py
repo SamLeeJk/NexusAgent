@@ -9,6 +9,8 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 from pydantic import BaseModel, Field
 
+from observability import observed
+
 
 class Intent(BaseModel):
     action: Literal["order", "refund", "policy", "clarify"]
@@ -183,7 +185,7 @@ def build_support_graph(db, saver, model, proposal_ttl=900):
         ("approval", approval),
         ("execute", execute),
     ):
-        graph.add_node(name, node)
+        graph.add_node(name, observed("agent." + name, "node")(node))
     graph.add_edge(START, "understand")
     graph.add_edge("understand", "resolve")
     graph.add_conditional_edges(

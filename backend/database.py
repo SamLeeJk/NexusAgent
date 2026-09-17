@@ -27,6 +27,8 @@ from sqlalchemy import (
     text,
 )
 
+from observability import observed
+
 metadata = MetaData()
 versions = Table(
     "schema_versions", metadata, Column("version", Integer, primary_key=True)
@@ -222,6 +224,7 @@ class Database:
         from knowledge import KnowledgeStore
         KnowledgeStore(self).seed_demo()
 
+    @observed("db.login", "database")
     def login(self, username, password):
         with self.engine.begin() as conn:
             user = row(conn, users, users.c.username == username)
@@ -243,6 +246,7 @@ class Database:
             )
             return token, {"id": user["id"], "username": user["username"], "role": user["role"]}
 
+    @observed("db.authenticate", "database")
     def authenticate(self, token):
         with self.engine.connect() as conn:
             session = row(
@@ -291,6 +295,7 @@ class Database:
                 ).mappings()
             ]
 
+    @observed("db.get_order", "database")
     def get_order(self, uid, oid):
         with self.engine.connect() as conn:
             return row(conn, orders, (orders.c.id == oid) & (orders.c.user_id == uid))
@@ -304,6 +309,7 @@ class Database:
                 ).mappings()
             ]
 
+    @observed("db.snapshot", "database", {"conversation_id": "cid"})
     def snapshot(self, uid, cid):
         self.own_conversation(uid, cid)
         with self.engine.connect() as conn:
@@ -349,6 +355,7 @@ class Database:
                 )
             )
 
+    @observed("db.begin_turn", "database")
     def begin_turn(self, uid, cid, request_id, content):
         self.own_conversation(uid, cid)
         with self.engine.begin() as conn:
@@ -380,6 +387,7 @@ class Database:
             self.message(conn, cid, value["id"], "user", content)
             return value
 
+    @observed("db.finish_turn", "database")
     def finish_turn(self, cid, tid, reply, waiting=False, decision=False, sources=None):
         with self.engine.begin() as conn:
             conn.execute(
@@ -389,6 +397,7 @@ class Database:
             )
             self.message(conn, cid, tid, "decision" if decision else "reply", reply, sources)
 
+    @observed("db.propose", "database")
     def propose(self, uid, cid, tid, oid, ttl):
         pid = str(uuid5(NAMESPACE_URL, "nexus-refund:" + tid))
         with self.engine.begin() as conn:
@@ -425,6 +434,7 @@ class Database:
                 raise BusinessError(404, "操作提案不存在。")
             return value
 
+    @observed("db.decide", "database")
     def decide(self, uid, cid, pid, decision):
         self.get_proposal(uid, cid, pid)
         with self.engine.begin() as conn:
@@ -443,6 +453,7 @@ class Database:
             )
         return self.get_proposal(uid, cid, pid)
 
+    @observed("db.execute", "database")
     def execute(self, uid, cid, pid):
         proposal = self.get_proposal(uid, cid, pid)
         with self.lock("order:" + proposal["order_id"]):

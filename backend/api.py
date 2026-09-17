@@ -16,6 +16,8 @@ from service import SupportService
 from sqlalchemy import text
 from workflow import IntentModel
 
+from observability import Observability, TelemetryMiddleware, mark_error
+
 
 class LoginInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -60,8 +62,9 @@ class SearchInput(BaseModel):
     top_k: int = Field(default=3, ge=1, le=10)
 
 
-def create_app(config=None, db=None, model=None):
+def create_app(config=None, db=None, model=None, telemetry=None):
     config = config or Config.environment()
+    telemetry = telemetry or Observability(config)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -76,23 +79,36 @@ def create_app(config=None, db=None, model=None):
             model or IntentModel(config.demo_mode, config.api_key, config.model),
             config.proposal_ttl,
         )
-        yield
-        database.engine.dispose()
+        try:
+            yield
+        finally:
+            database.engine.dispose()
+            telemetry.shutdown()
 
     app = FastAPI(title="NexusAgent", lifespan=lifespan)
+    app.state.telemetry = telemetry
+
+    if telemetry.enabled:
+        @app.get("/metrics", include_in_schema=False)
+        def metrics():
+            from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+            return Response(generate_latest(telemetry.registry), headers={"Content-Type": CONTENT_TYPE_LATEST})
 
     @app.exception_handler(BusinessError)
     async def business_error(request, exc):
+        mark_error(exc)
         return JSONResponse(status_code=exc.status, content={"detail": exc.detail})
 
     @app.exception_handler(OpenAIError)
     async def model_error(request, exc):
+        mark_error(exc)
         return JSONResponse(
             status_code=502, content={"detail": "模型请求失败，请用原请求重试。"}
         )
 
     @app.exception_handler(GraphRecursionError)
     async def graph_error(request, exc):
+        mark_error(exc)
         return JSONResponse(
             status_code=504, content={"detail": "运行达到步数上限，请联系维护者。"}
         )
@@ -238,4 +254,7 @@ def create_app(config=None, db=None, model=None):
         def index():
             return FileResponse(frontend / "index.html")
 
+    # Outermost user middleware also measures CSRF rejections. No request bodies,
+    # cookies, raw paths, SQL or exception messages are collected.
+    app.add_middleware(TelemetryMiddleware, telemetry=telemetry)
     return app
