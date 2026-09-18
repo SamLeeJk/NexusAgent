@@ -8,6 +8,7 @@ from database import BusinessError, Database
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from hybrid_retrieval import HybridRetriever
 from knowledge import KnowledgeStore
 from langgraph.errors import GraphRecursionError
 from openai import OpenAIError
@@ -74,10 +75,12 @@ def create_app(config=None, db=None, model=None, telemetry=None):
         if config.seed_demo:
             database.seed_demo()
         app.state.db = database
+        app.state.retriever = HybridRetriever(config)
         app.state.service = SupportService(
             database,
             model or IntentModel(config.demo_mode, config.api_key, config.model),
             config.proposal_ttl,
+            app.state.retriever,
         )
         try:
             yield
@@ -161,7 +164,9 @@ def create_app(config=None, db=None, model=None, telemetry=None):
 
     @app.post("/api/knowledge/search")
     def search_knowledge(payload: SearchInput, request: Request, user: CurrentUser):
-        return KnowledgeStore(request.app.state.db).search(payload.query, payload.top_k)
+        return KnowledgeStore(
+            request.app.state.db, request.app.state.retriever
+        ).search(payload.query, payload.top_k)
 
     @app.get("/api/knowledge/sources/{chunk_id}")
     def knowledge_source(chunk_id: UUID, request: Request, user: CurrentUser):
@@ -175,6 +180,7 @@ def create_app(config=None, db=None, model=None, telemetry=None):
             "status": "ok",
             "mode": "demo" if config.demo_mode else "model",
             "storage": "sqlite-local" if request.app.state.db.sqlite else "postgresql",
+            "retrieval": config.retrieval_mode,
         }
 
     @app.post("/api/login")

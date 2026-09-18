@@ -75,6 +75,18 @@ def test_traceparent_propagates_to_graph_retrieval_and_database(observed_app):
     assert set(http_record) == set(LOG_FIELDS)
     assert http_record["turn_id"] == server.attributes["nexus.turn_id"]
     assert sample(client, "nexus_retrieval_total", {"outcome": "found"}) == 1
+    assert (
+        sample(
+            client,
+            "nexus_retrieval_mode_total",
+            {
+                "requested_mode": "lexical",
+                "used_mode": "lexical",
+                "fallback": "false",
+            },
+        )
+        == 1
+    )
 
 
 def test_waiting_resume_and_replay_preserve_business_semantics(observed_app):

@@ -72,8 +72,9 @@ publications = Table(
 
 
 class KnowledgeStore:
-    def __init__(self, db):
+    def __init__(self, db, retriever=None):
         self.db = db
+        self.retriever = retriever
 
     @staticmethod
     def require_admin(conn, uid):
@@ -275,7 +276,10 @@ class KnowledgeStore:
 
     @observed("knowledge.search", "retrieval")
     def search(self, query, top_k=3):
-        return rank_chunks(self.active_chunks(), query, top_k)
+        sources = self.active_chunks()
+        if self.retriever is not None:
+            return self.retriever.search(sources, query, top_k)
+        return rank_chunks(sources, query, top_k)
 
     def source(self, chunk_id):
         with self.db.engine.connect() as conn:

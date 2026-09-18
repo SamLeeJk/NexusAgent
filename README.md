@@ -29,7 +29,8 @@ Ask “O1002 能退款吗？”, then “帮我申请”. Refresh the page while
 - Durable `interrupt` / `Command(resume=...)` workflow; model text is never approval.
 - Transactional refund request creation, order uniqueness, idempotent request IDs and receipt recovery.
 - Cross-process conversation locking; execution rechecks the latest order state and ownership.
-- Chinese/English lexical policy retrieval with BM25, query coverage filtering and no-match handling.
+- Chinese/English lexical, vector or hybrid policy retrieval with explicit no-match handling.
+- Local multilingual ONNX embeddings, Qdrant indexing, reciprocal-rank fusion and lexical fallback.
 - Admin Markdown import, immutable drafts, atomic publication, stale-update protection and rollback.
 - Persisted citations with source lines and historical-version access; unpublished drafts remain private.
 - A fixed synthetic retrieval regression set with metric gates and reproducible JSON/Markdown reports.
@@ -102,9 +103,32 @@ From the repository root with development dependencies installed:
 python -m pytest backend/tests -q
 python -m ruff check backend
 python backend/evaluate_knowledge.py
+python backend/evaluate_hybrid.py --cache-dir backend/runtime/models
 ```
 
 Set `NEXUS_TEST_DATABASE_URL` to a **dedicated PostgreSQL test database** to run `backend/tests/test_support.py` and `backend/tests/test_knowledge.py` against PostgreSQL. Tests create and remove their own random schemas. Without it, tests use temporary SQLite databases. Live-model tests are skipped unless `NEXUS_LIVE_EVAL=1` is explicitly enabled.
+
+### Stage 3B hybrid retrieval
+
+Lexical retrieval remains the default, so normal unit tests and a basic app startup do not require Qdrant or a model download. To run the measured hybrid mode locally from PowerShell:
+
+```powershell
+$env:NEXUS_HTTP_PORT='8001'
+$env:NEXUS_RETRIEVAL_MODE='hybrid'
+docker compose -p nexusagent-stage2 -f backend/docker-compose.yml --profile search up --build -d qdrant app
+```
+
+The first hybrid query downloads the FastEmbed runtime model `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` at immutable ONNX repository revision `faf4aa4225822f3bc6376869cb1164e8e3feedd0` into the `embedding_cache` volume. Qdrant and its Python client are pinned to compatible 1.15 releases. PostgreSQL remains the source of truth: only chunks returned by the current active-version query are accepted, and Qdrant payloads are filtered by the active corpus hash. Re-indexing the same corpus is idempotent. Publishing or rolling back changes that hash and synchronizes the newly active chunks; drafts cannot enter search results.
+
+Set `NEXUS_RETRIEVAL_MODE` to `lexical`, `vector` or `hybrid`. `NEXUS_QDRANT_URL`, `NEXUS_QDRANT_COLLECTION`, `NEXUS_EMBEDDING_CACHE_DIR` and `NEXUS_VECTOR_SCORE_THRESHOLD` are optional. If embedding or Qdrant access fails in vector/hybrid mode, the request completes with lexical results and returns `mode_used=lexical`, `fallback=true` and the controlled reason `vector_unavailable`; exception text is not returned. With observability enabled, `nexus_retrieval_mode_total{requested_mode,used_mode,fallback}` records the path without high-cardinality identifiers.
+
+The frozen Stage 3B evaluation contains 48 bilingual paraphrases and 32 unsupported questions. Run Qdrant, then execute:
+
+```powershell
+python backend/evaluate_hybrid.py --cache-dir backend/runtime/models
+```
+
+The checked-in run achieved Hybrid Hit@3 95.8%, MRR@3 93.4% and 100% no-answer rejection on that synthetic set. The lexical mode intentionally scored 0% Hit@3 on these paraphrase-heavy cases while rejecting all negatives, making the comparison a hard regression set rather than a production-quality estimate. See [the Stage 3B acceptance record](docs/阶段3B-混合检索计划与验收.md) and [machine-readable report](docs/validation/stage3b-hybrid.json).
 
 With the demo server running at port 8000, run `npm run test:e2e` in `frontend/`. This uses installed Chrome and writes only to demo accounts. Build with `npm run build` to check TypeScript and generate frontend assets.
 
@@ -196,9 +220,9 @@ Instrumentation follows [OpenTelemetry Python's manual instrumentation API](http
 
 ## Scope and next work
 
-No payment gateway, production identity lifecycle, SSE, vector/hybrid search, full operator console or load certification is included. The knowledge admin page is implemented. Authentication and rule-based demo mode are suitable for the local portfolio environment, not an assertion of production readiness.
+No payment gateway, production identity lifecycle, SSE, full operator console or load certification is included. The knowledge admin page and optional vector/hybrid retrieval are implemented. Authentication and rule-based demo mode are suitable for the local portfolio environment, not an assertion of production readiness.
 
-Stage 3A delivers versioned knowledge ingestion and a lexical evaluation baseline. Migration 002 adds roles, message sources and knowledge tables without resetting existing conversations or receipts. Seed data never overwrites a published policy. The next milestone is a measured vector/hybrid retrieval comparison, followed by streaming and operator handoff.
+Stage 3A delivers versioned knowledge ingestion and a lexical evaluation baseline. Stage 3B adds the measured optional hybrid retrieval path while keeping PostgreSQL publication semantics authoritative. Migration 002 adds roles, message sources and knowledge tables without resetting existing conversations or receipts. Seed data never overwrites a published policy. Streaming and operator handoff remain future milestones.
 
 - [Current progress](docs/PROGRESS.md)
 - [Deployment and acceptance walkthrough](docs/阶段2-验收与部署.md)

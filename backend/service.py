@@ -8,11 +8,14 @@ from observability import bind, observed, outcome
 
 
 class SupportService:
-    def __init__(self, db, model, proposal_ttl=900):
+    def __init__(self, db, model, proposal_ttl=900, retriever=None):
         self.db, self.model, self.proposal_ttl = db, model, proposal_ttl
+        self.retriever = retriever
 
     def graph(self, saver):
-        return build_support_graph(self.db, saver, self.model, self.proposal_ttl)
+        return build_support_graph(
+            self.db, saver, self.model, self.proposal_ttl, self.retriever
+        )
 
     @staticmethod
     def config(cid):

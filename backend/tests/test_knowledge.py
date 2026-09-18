@@ -139,6 +139,8 @@ def test_bilingual_and_no_answer_search(client):
     ):
         result = search(client, query)
         assert result["found"], query
+        assert result["mode_requested"] == result["mode_used"] == "lexical"
+        assert result["fallback"] is False
     for query in ("天气预报", "bitcoin refund", "   "):
         assert not search(client, query)["found"], query
 

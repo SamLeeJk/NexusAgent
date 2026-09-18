@@ -90,7 +90,7 @@ class IntentModel:
         )
 
 
-def build_support_graph(db, saver, model, proposal_ttl=900):
+def build_support_graph(db, saver, model, proposal_ttl=900, retriever=None):
     def understand(state):
         history = db.snapshot(state["user_id"], state["conversation_id"])["messages"]
         history = [m for m in history if m["turn_id"] != state["turn_id"]]
@@ -104,7 +104,7 @@ def build_support_graph(db, saver, model, proposal_ttl=900):
                 "reply": "请提供订单编号，并说明想查询状态、咨询退款资格，还是发起申请。"
             }
         if intent["action"] == "policy":
-            result = KnowledgeStore(db).search(state["text"])
+            result = KnowledgeStore(db, retriever).search(state["text"])
             if not result["found"]:
                 return {
                     "reply": "当前已发布知识库未找到足够的匹配依据。可以提供订单编号查询资格，或请人工协助。",

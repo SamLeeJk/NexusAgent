@@ -148,6 +148,12 @@ class Observability:
             ["outcome"],
             registry=self.registry,
         )
+        self.retrieval_modes = Counter(
+            "nexus_retrieval_mode_total",
+            "Knowledge retrieval by requested mode, used mode and fallback",
+            ["requested_mode", "used_mode", "fallback"],
+            registry=self.registry,
+        )
 
     @staticmethod
     def _write_log(record):
@@ -249,6 +255,11 @@ def observed(name, category, ids=None):
                 if category == "retrieval":
                     obs.retrievals.labels(
                         "found" if result["found"] else "no_match"
+                    ).inc()
+                    obs.retrieval_modes.labels(
+                        result.get("mode_requested", "lexical"),
+                        result.get("mode_used", "lexical"),
+                        str(bool(result.get("fallback"))).lower(),
                     ).inc()
                 return result
 
