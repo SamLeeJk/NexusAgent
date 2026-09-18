@@ -4,23 +4,31 @@ from database import BusinessError
 from langgraph.types import Command
 from workflow import build_support_graph
 
+from observability import bind, observed, outcome
+
 
 class SupportService:
-    def __init__(self, db, model, proposal_ttl=900):
+    def __init__(self, db, model, proposal_ttl=900, retriever=None):
         self.db, self.model, self.proposal_ttl = db, model, proposal_ttl
+        self.retriever = retriever
 
     def graph(self, saver):
-        return build_support_graph(self.db, saver, self.model, self.proposal_ttl)
+        return build_support_graph(
+            self.db, saver, self.model, self.proposal_ttl, self.retriever
+        )
 
     @staticmethod
     def config(cid):
         return {"configurable": {"thread_id": cid}, "recursion_limit": 12}
 
+    @observed("agent.send", "service", {"conversation_id": "cid", "request_id": "request_id"})
     def send(self, uid, cid, request_id, content):
         self.db.own_conversation(uid, cid)
         with self.db.lock("conversation:" + cid):
             turn = self.db.begin_turn(uid, cid, request_id, content)
+            bind(turn_id=turn["id"])
             if turn["status"] in ("completed", "waiting"):
+                outcome("send", "replay")
                 return self.db.snapshot(uid, cid)
             with self.db.checkpoint() as saver:
                 graph, config = self.graph(saver), self.config(cid)
@@ -43,14 +51,18 @@ class SupportService:
                     )
                 state = graph.get_state(config)
                 self.db.finish_turn(
-                    cid, turn["id"], state.values["reply"], waiting=bool(state.next)
+                    cid, turn["id"], state.values["reply"], waiting=bool(state.next),
+                    sources=state.values.get("sources", []),
                 )
+                outcome("send", "waiting" if state.next else "completed")
             return self.db.snapshot(uid, cid)
 
+    @observed("agent.decide", "service", {"conversation_id": "cid"})
     def decide(self, uid, cid, pid, decision):
         self.db.own_conversation(uid, cid)
         with self.db.lock("conversation:" + cid):
             proposal = self.db.get_proposal(uid, cid, pid)
+            bind(turn_id=proposal["turn_id"])
             with self.db.checkpoint() as saver:
                 graph, config = self.graph(saver), self.config(cid)
                 state = graph.get_state(config)
@@ -68,6 +80,7 @@ class SupportService:
                     self.db.finish_turn(
                         cid, proposal["turn_id"], proposal["result"], decision=True
                     )
+                    outcome("decide", "replay")
                     return self.db.snapshot(uid, cid)
                 if (
                     state.values.get("proposal_id") != pid
@@ -82,4 +95,7 @@ class SupportService:
                         graph.invoke(None, config)
                 result = graph.get_state(config).values["reply"]
                 self.db.finish_turn(cid, proposal["turn_id"], result, decision=True)
-            return self.db.snapshot(uid, cid)
+            snapshot = self.db.snapshot(uid, cid)
+            final = next(p for p in snapshot["proposals"] if p["id"] == pid)
+            outcome("decide", final["status"])
+            return snapshot

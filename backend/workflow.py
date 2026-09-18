@@ -1,16 +1,15 @@
 """Durable customer workflow: intent, authoritative lookup, explicit approval, execution."""
 
 import re
-from pathlib import Path
 from typing import Literal, TypedDict
 
 from database import BusinessError
+from knowledge import KnowledgeStore
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 from pydantic import BaseModel, Field
-from retrieval import search_policy
 
-POLICY_PATH = Path(__file__).parent / "data" / "knowledge" / "refund_policy.md"
+from observability import observed
 
 
 class Intent(BaseModel):
@@ -27,6 +26,7 @@ class SupportState(TypedDict, total=False):
     intent: dict
     proposal_id: str | None
     reply: str
+    sources: list[dict]
 
 
 class IntentModel:
@@ -45,6 +45,8 @@ class IntentModel:
                 r"(?<![A-Za-z0-9])O\d+(?![A-Za-z0-9])", text, re.IGNORECASE
             )
             oid = found.group().upper() if found else current_order
+            if not found and any(word in text.lower() for word in ("政策", "policy", "规定", "规则")):
+                return Intent(action="policy")
             if any(
                 word in text.lower()
                 for word in ("申请", "帮我退", "提交", "proceed", "create", "apply")
@@ -88,12 +90,12 @@ class IntentModel:
         )
 
 
-def build_support_graph(db, saver, model, proposal_ttl=900):
+def build_support_graph(db, saver, model, proposal_ttl=900, retriever=None):
     def understand(state):
         history = db.snapshot(state["user_id"], state["conversation_id"])["messages"]
         history = [m for m in history if m["turn_id"] != state["turn_id"]]
         intent = model.classify(state["text"], state.get("current_order"), history)
-        return {"intent": intent.model_dump(), "proposal_id": None, "reply": ""}
+        return {"intent": intent.model_dump(), "proposal_id": None, "reply": "", "sources": []}
 
     def resolve(state):
         intent = state["intent"]
@@ -102,17 +104,19 @@ def build_support_graph(db, saver, model, proposal_ttl=900):
                 "reply": "请提供订单编号，并说明想查询状态、咨询退款资格，还是发起申请。"
             }
         if intent["action"] == "policy":
-            result = search_policy(POLICY_PATH, state["text"])
+            result = KnowledgeStore(db, retriever).search(state["text"])
             if not result["found"]:
                 return {
-                    "reply": "当前英文政策知识库未找到匹配依据。可以提供订单编号查询资格，或请人工协助。"
+                    "reply": "当前已发布知识库未找到足够的匹配依据。可以提供订单编号查询资格，或请人工协助。",
+                    "sources": [],
                 }
             return {
                 "reply": "政策参考：\n"
                 + "\n".join(
-                    f"{s['text']} [{s['source']}:L{s['line']}]"
+                    f"{s['text']} [{s['title']} v{s['version']}，第 {s['start_line']}–{s['end_line']} 行]"
                     for s in result["sources"]
-                )
+                ),
+                "sources": result["sources"],
             }
         oid = intent.get("order_id")
         if not oid:
@@ -181,7 +185,7 @@ def build_support_graph(db, saver, model, proposal_ttl=900):
         ("approval", approval),
         ("execute", execute),
     ):
-        graph.add_node(name, node)
+        graph.add_node(name, observed("agent." + name, "node")(node))
     graph.add_edge(START, "understand")
     graph.add_edge("understand", "resolve")
     graph.add_conditional_edges(

@@ -1,0 +1,15 @@
+apiVersion: 1
+datasources:
+  - name: Nexus Prometheus
+    uid: nexus-prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+  - name: Nexus Jaeger
+    uid: nexus-jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    editable: false

@@ -8,12 +8,16 @@ from database import BusinessError, Database
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from hybrid_retrieval import HybridRetriever
+from knowledge import KnowledgeStore
 from langgraph.errors import GraphRecursionError
 from openai import OpenAIError
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from service import SupportService
 from sqlalchemy import text
 from workflow import IntentModel
+
+from observability import Observability, TelemetryMiddleware, mark_error
 
 
 class LoginInput(BaseModel):
@@ -40,8 +44,28 @@ class DecisionInput(BaseModel):
     decision: Literal["approve", "reject"]
 
 
-def create_app(config=None, db=None, model=None):
+class KnowledgeInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    slug: str = Field(pattern=r"^[a-z0-9][a-z0-9-]{0,79}$")
+    title: str = Field(min_length=1, max_length=200)
+    content: str = Field(min_length=1, max_length=200000)
+
+
+class PublishInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    version_id: UUID
+    expected_active_version_id: UUID | None
+
+
+class SearchInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    query: str = Field(min_length=1, max_length=2000)
+    top_k: int = Field(default=3, ge=1, le=10)
+
+
+def create_app(config=None, db=None, model=None, telemetry=None):
     config = config or Config.environment()
+    telemetry = telemetry or Observability(config)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -51,28 +75,43 @@ def create_app(config=None, db=None, model=None):
         if config.seed_demo:
             database.seed_demo()
         app.state.db = database
+        app.state.retriever = HybridRetriever(config)
         app.state.service = SupportService(
             database,
             model or IntentModel(config.demo_mode, config.api_key, config.model),
             config.proposal_ttl,
+            app.state.retriever,
         )
-        yield
-        database.engine.dispose()
+        try:
+            yield
+        finally:
+            database.engine.dispose()
+            telemetry.shutdown()
 
     app = FastAPI(title="NexusAgent", lifespan=lifespan)
+    app.state.telemetry = telemetry
+
+    if telemetry.enabled:
+        @app.get("/metrics", include_in_schema=False)
+        def metrics():
+            from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+            return Response(generate_latest(telemetry.registry), headers={"Content-Type": CONTENT_TYPE_LATEST})
 
     @app.exception_handler(BusinessError)
     async def business_error(request, exc):
+        mark_error(exc)
         return JSONResponse(status_code=exc.status, content={"detail": exc.detail})
 
     @app.exception_handler(OpenAIError)
     async def model_error(request, exc):
+        mark_error(exc)
         return JSONResponse(
             status_code=502, content={"detail": "模型请求失败，请用原请求重试。"}
         )
 
     @app.exception_handler(GraphRecursionError)
     async def graph_error(request, exc):
+        mark_error(exc)
         return JSONResponse(
             status_code=504, content={"detail": "运行达到步数上限，请联系维护者。"}
         )
@@ -99,6 +138,40 @@ def create_app(config=None, db=None, model=None):
 
     CurrentUser = Annotated[dict, Depends(current_user)]
 
+    def admin_user(user: CurrentUser):
+        if user["role"] != "admin":
+            raise HTTPException(403, "仅知识库管理员可以执行此操作。")
+        return user
+
+    AdminUser = Annotated[dict, Depends(admin_user)]
+
+    @app.get("/api/admin/knowledge/documents")
+    def knowledge_documents(request: Request, user: AdminUser):
+        return KnowledgeStore(request.app.state.db).list_documents(user["id"])
+
+    @app.post("/api/admin/knowledge/documents")
+    def import_knowledge(payload: KnowledgeInput, request: Request, user: AdminUser):
+        return KnowledgeStore(request.app.state.db).import_document(user["id"], payload.slug, payload.title, payload.content)
+
+    @app.get("/api/admin/knowledge/versions/{vid}")
+    def preview_knowledge(vid: UUID, request: Request, user: AdminUser):
+        return KnowledgeStore(request.app.state.db).preview(user["id"], str(vid))
+
+    @app.post("/api/admin/knowledge/documents/{did}/publish")
+    def publish_knowledge(did: UUID, payload: PublishInput, request: Request, user: AdminUser):
+        return KnowledgeStore(request.app.state.db).publish(user["id"], str(did), str(payload.version_id),
+            str(payload.expected_active_version_id) if payload.expected_active_version_id else None)
+
+    @app.post("/api/knowledge/search")
+    def search_knowledge(payload: SearchInput, request: Request, user: CurrentUser):
+        return KnowledgeStore(
+            request.app.state.db, request.app.state.retriever
+        ).search(payload.query, payload.top_k)
+
+    @app.get("/api/knowledge/sources/{chunk_id}")
+    def knowledge_source(chunk_id: UUID, request: Request, user: CurrentUser):
+        return KnowledgeStore(request.app.state.db).source(str(chunk_id))
+
     @app.get("/api/health")
     def health(request: Request):
         with request.app.state.db.engine.connect() as conn:
@@ -107,6 +180,7 @@ def create_app(config=None, db=None, model=None):
             "status": "ok",
             "mode": "demo" if config.demo_mode else "model",
             "storage": "sqlite-local" if request.app.state.db.sqlite else "postgresql",
+            "retrieval": config.retrieval_mode,
         }
 
     @app.post("/api/login")
@@ -186,4 +260,7 @@ def create_app(config=None, db=None, model=None):
         def index():
             return FileResponse(frontend / "index.html")
 
+    # Outermost user middleware also measures CSRF rejections. No request bodies,
+    # cookies, raw paths, SQL or exception messages are collected.
+    app.add_middleware(TelemetryMiddleware, telemetry=telemetry)
     return app

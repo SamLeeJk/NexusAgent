@@ -1,0 +1,572 @@
+{
+  "dataset_version": "support-lexical-v1",
+  "dataset_sha256": "64fea04632935dccd30e7c983f2e381aa1a0a9093a3838c2a6c7025a7bda0e3f",
+  "corpus_sha256": "7b330a6575271658e9aa1d27a01c34fc39eedcf047f20dfccdfcb58e04a03e1f",
+  "chunk_count": 6,
+  "algorithm": "bilingual-bm25-coverage-v1",
+  "min_coverage": 0.6,
+  "python": "3.12.14",
+  "scope": "Synthetic regression only; both rankers use the same chunks. Timing excludes DB I/O.",
+  "gates": {
+    "hit_at_3": 0.9,
+    "mrr_at_3": 0.75,
+    "no_answer_rejection": 0.875
+  },
+  "gate_results": {
+    "hit_at_3": true,
+    "mrr_at_3": true,
+    "no_answer_rejection": true
+  },
+  "passed": true,
+  "baseline": {
+    "answerable_count": 20,
+    "unanswerable_count": 8,
+    "hit_at_3": 0.6,
+    "mrr_at_3": 0.6,
+    "no_answer_rejection": 0.875,
+    "mean_ranking_ms": 0.10201785714311232,
+    "cases": [
+      {
+        "id": "en-01",
+        "query": "processing eligible",
+        "gold_section": "processing",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / processing / 处理中订单",
+          "售后政策 / Support policy / shipped / 已发货订单"
+        ]
+      },
+      {
+        "id": "en-02",
+        "query": "processing refund request",
+        "gold_section": "processing",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / processing / 处理中订单",
+          "售后政策 / Support policy / duplicates / 重复申请",
+          "售后政策 / Support policy / cancellation / 取消确认"
+        ]
+      },
+      {
+        "id": "en-03",
+        "query": "shipped automatic refund",
+        "gold_section": "shipped",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / shipped / 已发货订单",
+          "售后政策 / Support policy / cancellation / 取消确认",
+          "售后政策 / Support policy / processing / 处理中订单"
+        ]
+      },
+      {
+        "id": "en-04",
+        "query": "confirmation expires 15 minutes",
+        "gold_section": "confirmation",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / confirmation / 确认与有效期",
+          "售后政策 / Support policy / cancellation / 取消确认"
+        ]
+      },
+      {
+        "id": "en-05",
+        "query": "duplicate requests same order",
+        "gold_section": "duplicates",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / duplicates / 重复申请",
+          "售后政策 / Support policy / shipped / 已发货订单",
+          "售后政策 / Support policy / confirmation / 确认与有效期"
+        ]
+      },
+      {
+        "id": "en-06",
+        "query": "payment gateway",
+        "gold_section": "payment",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / payment / 申请与到账"
+        ]
+      },
+      {
+        "id": "en-07",
+        "query": "cancel confirmation card",
+        "gold_section": "cancellation",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / cancellation / 取消确认",
+          "售后政策 / Support policy / confirmation / 确认与有效期"
+        ]
+      },
+      {
+        "id": "en-08",
+        "query": "eligibility inquiry",
+        "gold_section": "processing",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / processing / 处理中订单"
+        ]
+      },
+      {
+        "id": "en-09",
+        "query": "money returned",
+        "gold_section": "payment",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / payment / 申请与到账"
+        ]
+      },
+      {
+        "id": "en-10",
+        "query": "only one request per order",
+        "gold_section": "duplicates",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / duplicates / 重复申请",
+          "售后政策 / Support policy / confirmation / 确认与有效期",
+          "售后政策 / Support policy / processing / 处理中订单"
+        ]
+      },
+      {
+        "id": "zh-01",
+        "query": "处理中订单退款",
+        "gold_section": "processing",
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "zh-02",
+        "query": "已发货订单",
+        "gold_section": "shipped",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / shipped / 已发货订单"
+        ]
+      },
+      {
+        "id": "zh-03",
+        "query": "退款确认有效期",
+        "gold_section": "confirmation",
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "zh-04",
+        "query": "确认过期需要重新申请",
+        "gold_section": "confirmation",
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "zh-05",
+        "query": "同一订单重复提交",
+        "gold_section": "duplicates",
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "zh-06",
+        "query": "重复创建退款申请",
+        "gold_section": "duplicates",
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "zh-07",
+        "query": "资金到账",
+        "gold_section": "payment",
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "zh-08",
+        "query": "不执行资金退款",
+        "gold_section": "payment",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / payment / 申请与到账"
+        ]
+      },
+      {
+        "id": "zh-09",
+        "query": "取消确认卡",
+        "gold_section": "cancellation",
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "zh-10",
+        "query": "取消不创建申请",
+        "gold_section": "cancellation",
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-01",
+        "query": "天气预报",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-02",
+        "query": "stock market price",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-03",
+        "query": "火星配送时效",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-04",
+        "query": "bitcoin refund",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / cancellation / 取消确认",
+          "售后政策 / Support policy / shipped / 已发货订单",
+          "售后政策 / Support policy / processing / 处理中订单"
+        ]
+      },
+      {
+        "id": "none-05",
+        "query": "现金退款汇率",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-06",
+        "query": "修改密码步骤",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-07",
+        "query": "shipping insurance claim",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-08",
+        "query": "保修期限多久",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      }
+    ]
+  },
+  "current": {
+    "answerable_count": 20,
+    "unanswerable_count": 8,
+    "hit_at_3": 1.0,
+    "mrr_at_3": 1.0,
+    "no_answer_rejection": 1.0,
+    "mean_ranking_ms": 0.06199285715118614,
+    "cases": [
+      {
+        "id": "en-01",
+        "query": "processing eligible",
+        "gold_section": "processing",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / processing / 处理中订单"
+        ]
+      },
+      {
+        "id": "en-02",
+        "query": "processing refund request",
+        "gold_section": "processing",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / processing / 处理中订单",
+          "售后政策 / Support policy / duplicates / 重复申请",
+          "售后政策 / Support policy / shipped / 已发货订单"
+        ]
+      },
+      {
+        "id": "en-03",
+        "query": "shipped automatic refund",
+        "gold_section": "shipped",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / shipped / 已发货订单"
+        ]
+      },
+      {
+        "id": "en-04",
+        "query": "confirmation expires 15 minutes",
+        "gold_section": "confirmation",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / confirmation / 确认与有效期"
+        ]
+      },
+      {
+        "id": "en-05",
+        "query": "duplicate requests same order",
+        "gold_section": "duplicates",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / duplicates / 重复申请"
+        ]
+      },
+      {
+        "id": "en-06",
+        "query": "payment gateway",
+        "gold_section": "payment",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / payment / 申请与到账"
+        ]
+      },
+      {
+        "id": "en-07",
+        "query": "cancel confirmation card",
+        "gold_section": "cancellation",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / cancellation / 取消确认"
+        ]
+      },
+      {
+        "id": "en-08",
+        "query": "eligibility inquiry",
+        "gold_section": "processing",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / processing / 处理中订单"
+        ]
+      },
+      {
+        "id": "en-09",
+        "query": "money returned",
+        "gold_section": "payment",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / payment / 申请与到账"
+        ]
+      },
+      {
+        "id": "en-10",
+        "query": "only one request per order",
+        "gold_section": "duplicates",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / duplicates / 重复申请"
+        ]
+      },
+      {
+        "id": "zh-01",
+        "query": "处理中订单退款",
+        "gold_section": "processing",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / processing / 处理中订单"
+        ]
+      },
+      {
+        "id": "zh-02",
+        "query": "已发货订单",
+        "gold_section": "shipped",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / shipped / 已发货订单"
+        ]
+      },
+      {
+        "id": "zh-03",
+        "query": "退款确认有效期",
+        "gold_section": "confirmation",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / confirmation / 确认与有效期"
+        ]
+      },
+      {
+        "id": "zh-04",
+        "query": "确认过期需要重新申请",
+        "gold_section": "confirmation",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / confirmation / 确认与有效期"
+        ]
+      },
+      {
+        "id": "zh-05",
+        "query": "同一订单重复提交",
+        "gold_section": "duplicates",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / duplicates / 重复申请"
+        ]
+      },
+      {
+        "id": "zh-06",
+        "query": "重复创建退款申请",
+        "gold_section": "duplicates",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / duplicates / 重复申请",
+          "售后政策 / Support policy / processing / 处理中订单",
+          "售后政策 / Support policy / cancellation / 取消确认"
+        ]
+      },
+      {
+        "id": "zh-07",
+        "query": "资金到账",
+        "gold_section": "payment",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / payment / 申请与到账"
+        ]
+      },
+      {
+        "id": "zh-08",
+        "query": "不执行资金退款",
+        "gold_section": "payment",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / payment / 申请与到账"
+        ]
+      },
+      {
+        "id": "zh-09",
+        "query": "取消确认卡",
+        "gold_section": "cancellation",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / cancellation / 取消确认"
+        ]
+      },
+      {
+        "id": "zh-10",
+        "query": "取消不创建申请",
+        "gold_section": "cancellation",
+        "relevant_rank": 1,
+        "rejected": false,
+        "returned_sections": [
+          "售后政策 / Support policy / cancellation / 取消确认"
+        ]
+      },
+      {
+        "id": "none-01",
+        "query": "天气预报",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-02",
+        "query": "stock market price",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-03",
+        "query": "火星配送时效",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-04",
+        "query": "bitcoin refund",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-05",
+        "query": "现金退款汇率",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-06",
+        "query": "修改密码步骤",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-07",
+        "query": "shipping insurance claim",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      },
+      {
+        "id": "none-08",
+        "query": "保修期限多久",
+        "gold_section": null,
+        "relevant_rank": null,
+        "rejected": true,
+        "returned_sections": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,2948 @@
+{
+  "dataset_version": "support-hybrid-v2",
+  "dataset_sha256": "7d3d142175f50faff7bea91f005830ce29305c4a518d50ef5d5cc49906e2db69",
+  "corpus_sha256": "7b330a6575271658e9aa1d27a01c34fc39eedcf047f20dfccdfcb58e04a03e1f",
+  "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "model_revision": "faf4aa4225822f3bc6376869cb1164e8e3feedd0",
+  "vector_size": 384,
+  "vector_score_threshold": 0.35,
+  "python": "3.12.14",
+  "scope": "Frozen synthetic hard set; local ONNX embeddings and Qdrant; excludes DB I/O; each mode includes its first lazy model/index initialization.",
+  "gates": {
+    "hybrid_hit_at_3": 0.9,
+    "hybrid_mrr_at_3": 0.8,
+    "hybrid_no_answer_rejection": 0.9,
+    "hit_at_3_gain_over_lexical": 0.1
+  },
+  "observed": {
+    "hybrid_hit_at_3": 0.9583333333333334,
+    "hybrid_mrr_at_3": 0.9340277777777778,
+    "hybrid_no_answer_rejection": 1.0,
+    "hit_at_3_gain_over_lexical": 0.9583333333333334
+  },
+  "gate_results": {
+    "hybrid_hit_at_3": true,
+    "hybrid_mrr_at_3": true,
+    "hybrid_no_answer_rejection": true,
+    "hit_at_3_gain_over_lexical": true
+  },
+  "passed": true,
+  "modes": {
+    "lexical": {
+      "answerable_count": 48,
+      "unanswerable_count": 32,
+      "hit_at_3": 0.0,
+      "mrr_at_3": 0.0,
+      "no_answer_rejection": 1.0,
+      "mean_ms": 0.057487498634145595,
+      "p95_ms": 0.08969998452812433,
+      "fallback_count": 0,
+      "cases": [
+        {
+          "id": "processing-01",
+          "gold_section": "processing",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "processing-02",
+          "gold_section": "processing",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "processing-03",
+          "gold_section": "processing",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "processing-04",
+          "gold_section": "processing",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "processing-05",
+          "gold_section": "processing",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "processing-06",
+          "gold_section": "processing",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "processing-07",
+          "gold_section": "processing",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "processing-08",
+          "gold_section": "processing",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "shipped-01",
+          "gold_section": "shipped",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "shipped-02",
+          "gold_section": "shipped",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "shipped-03",
+          "gold_section": "shipped",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "shipped-04",
+          "gold_section": "shipped",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "shipped-05",
+          "gold_section": "shipped",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "shipped-06",
+          "gold_section": "shipped",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "shipped-07",
+          "gold_section": "shipped",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "shipped-08",
+          "gold_section": "shipped",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-01",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-02",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-03",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-04",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-05",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-06",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-07",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-08",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-01",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-02",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-03",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-04",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-05",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-06",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-07",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-08",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "payment-01",
+          "gold_section": "payment",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "payment-02",
+          "gold_section": "payment",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "payment-03",
+          "gold_section": "payment",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "payment-04",
+          "gold_section": "payment",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "payment-05",
+          "gold_section": "payment",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "payment-06",
+          "gold_section": "payment",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "payment-07",
+          "gold_section": "payment",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "payment-08",
+          "gold_section": "payment",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-01",
+          "gold_section": "cancellation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-02",
+          "gold_section": "cancellation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-03",
+          "gold_section": "cancellation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-04",
+          "gold_section": "cancellation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-05",
+          "gold_section": "cancellation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-06",
+          "gold_section": "cancellation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-07",
+          "gold_section": "cancellation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-08",
+          "gold_section": "cancellation",
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-01",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-02",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-03",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-04",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-05",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-06",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-07",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-08",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-09",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-10",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-11",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-12",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-13",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-14",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-15",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-16",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-17",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-18",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-19",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-20",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-21",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-22",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-23",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-24",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-25",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-26",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-27",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-28",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-29",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-30",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-31",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-32",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        }
+      ]
+    },
+    "vector": {
+      "answerable_count": 48,
+      "unanswerable_count": 32,
+      "hit_at_3": 0.9583333333333334,
+      "mrr_at_3": 0.9340277777777778,
+      "no_answer_rejection": 1.0,
+      "mean_ms": 90.31173125367786,
+      "p95_ms": 177.67930001718923,
+      "fallback_count": 0,
+      "cases": [
+        {
+          "id": "processing-01",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.7444539,
+            0.6634624,
+            0.5958977
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-02",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.7444539,
+            0.6634624,
+            0.6029136
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-03",
+          "gold_section": "processing",
+          "relevant_rank": 3,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.57447135,
+            0.5419509,
+            0.54118675
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-04",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.7444539,
+            0.6634624,
+            0.5958977
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-05",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.7444539,
+            0.6634624,
+            0.5958977
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-06",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.7444539,
+            0.6634624,
+            0.609262
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-07",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.54526687,
+            0.5330815,
+            0.52402884
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-08",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.7444539,
+            0.6634624,
+            0.5958977
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-01",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.6009368,
+            0.3739097,
+            0.3616852
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-02",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.6009368,
+            0.52613175,
+            0.46601617
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-03",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / payment / 申请与到账"
+          ],
+          "returned_scores": [
+            0.54850054,
+            0.51853305,
+            0.5040204
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-04",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.6024324,
+            0.48828372,
+            0.47032768
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-05",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.6009368
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-06",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.6009368,
+            0.4211721,
+            0.37557283
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-07",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.6009368,
+            0.44280905,
+            0.3841131
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-08",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / cancellation / 取消确认"
+          ],
+          "returned_scores": [
+            0.6009368,
+            0.4816079
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-01",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.74511945,
+            0.61033964,
+            0.3671491
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-02",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.74511945,
+            0.61033964,
+            0.38786644
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-03",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.40518576
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-04",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.74511945,
+            0.61033964,
+            0.41197336
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-05",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.74511945,
+            0.61033964,
+            0.3671491
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-06",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.48361897
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-07",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.74511945,
+            0.61033964,
+            0.3671491
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-08",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.74511945,
+            0.61033964,
+            0.3671491
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-01",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.7745647,
+            0.39560598,
+            0.3668794
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-02",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.7745647,
+            0.44290793,
+            0.3802656
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-03",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.46925628,
+            0.44894254,
+            0.44398716
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-04",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.7745647,
+            0.4422811,
+            0.43482518
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-05",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.7745647
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-06",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.7745647
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-07",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.7745647,
+            0.43938234,
+            0.42439649
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-08",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.7745647,
+            0.6820636,
+            0.6713462
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-01",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认"
+          ],
+          "returned_scores": [
+            0.6828159,
+            0.62643576,
+            0.5821714
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-02",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.6828159,
+            0.38500175,
+            0.38406724
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-03",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.6828159,
+            0.4869852,
+            0.40884364
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-04",
+          "gold_section": "payment",
+          "relevant_rank": 2,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账"
+          ],
+          "returned_scores": [
+            0.40053123,
+            0.37999618
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-05",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认"
+          ],
+          "returned_scores": [
+            0.6828159,
+            0.57392144,
+            0.5124298
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-06",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认"
+          ],
+          "returned_scores": [
+            0.5431106,
+            0.41729754,
+            0.3659382
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-07",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.6828159,
+            0.530289,
+            0.47081977
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-08",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.6828159,
+            0.4339891,
+            0.38406724
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-01",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.7929825,
+            0.5265109,
+            0.45593697
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-02",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.7929825,
+            0.4877301,
+            0.45593697
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-03",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.7929825,
+            0.74511945,
+            0.45593697
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-04",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.7929825,
+            0.4877301,
+            0.4727341
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-05",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.7929825,
+            0.74511945,
+            0.45593697
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-06",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.7929825,
+            0.4877301,
+            0.45593697
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-07",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.7929825,
+            0.74511945,
+            0.47176147
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-08",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.7929825,
+            0.4877301,
+            0.46864378
+          ],
+          "fallback": false
+        },
+        {
+          "id": "none-01",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-02",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-03",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-04",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-05",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-06",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-07",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-08",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-09",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-10",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-11",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-12",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-13",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-14",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-15",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-16",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-17",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-18",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-19",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-20",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-21",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-22",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-23",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-24",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-25",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-26",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-27",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-28",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-29",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-30",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-31",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-32",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        }
+      ]
+    },
+    "hybrid": {
+      "answerable_count": 48,
+      "unanswerable_count": 32,
+      "hit_at_3": 0.9583333333333334,
+      "mrr_at_3": 0.9340277777777778,
+      "no_answer_rejection": 1.0,
+      "mean_ms": 136.7770749999181,
+      "p95_ms": 192.58110001101159,
+      "fallback_count": 0,
+      "cases": [
+        {
+          "id": "processing-01",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-02",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-03",
+          "gold_section": "processing",
+          "relevant_rank": 3,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-04",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-05",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-06",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-07",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "processing-08",
+          "gold_section": "processing",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-01",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-02",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-03",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / payment / 申请与到账"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-04",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-05",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-06",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-07",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "shipped-08",
+          "gold_section": "shipped",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / cancellation / 取消确认"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-01",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-02",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-03",
+          "gold_section": "confirmation",
+          "relevant_rank": null,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-04",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-05",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-06",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.01639344262295082
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-07",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "confirmation-08",
+          "gold_section": "confirmation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-01",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-02",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-03",
+          "gold_section": "duplicates",
+          "relevant_rank": null,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-04",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-05",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.01639344262295082
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-06",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.01639344262295082
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-07",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / shipped / 已发货订单",
+            "售后政策 / Support policy / confirmation / 确认与有效期"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "duplicates-08",
+          "gold_section": "duplicates",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / duplicates / 重复申请",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-01",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-02",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-03",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-04",
+          "gold_section": "payment",
+          "relevant_rank": 2,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / payment / 申请与到账"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-05",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-06",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / cancellation / 取消确认"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-07",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "payment-08",
+          "gold_section": "payment",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / payment / 申请与到账",
+            "售后政策 / Support policy / processing / 处理中订单",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-01",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-02",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-03",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-04",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / shipped / 已发货订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-05",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-06",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / duplicates / 重复申请"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-07",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "cancellation-08",
+          "gold_section": "cancellation",
+          "relevant_rank": 1,
+          "rejected": false,
+          "returned_sections": [
+            "售后政策 / Support policy / cancellation / 取消确认",
+            "售后政策 / Support policy / confirmation / 确认与有效期",
+            "售后政策 / Support policy / processing / 处理中订单"
+          ],
+          "returned_scores": [
+            0.01639344262295082,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "fallback": false
+        },
+        {
+          "id": "none-01",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-02",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-03",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-04",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-05",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-06",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-07",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-08",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-09",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-10",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-11",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-12",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-13",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-14",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-15",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-16",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-17",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-18",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-19",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-20",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-21",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-22",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-23",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-24",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-25",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-26",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-27",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-28",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-29",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-30",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-31",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        },
+        {
+          "id": "none-32",
+          "gold_section": null,
+          "relevant_rank": null,
+          "rejected": true,
+          "returned_sections": [],
+          "returned_scores": [],
+          "fallback": false
+        }
+      ]
+    }
+  }
+}
