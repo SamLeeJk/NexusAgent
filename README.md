@@ -6,17 +6,30 @@ The application creates **refund requests**, not financial transfers. It is a po
 
 ## Run the full stack
 
+For the complete portfolio/demo environment with hybrid retrieval and observability, run from PowerShell:
+
+```powershell
+$env:NEXUS_HTTP_PORT='8001'
+$env:NEXUS_RETRIEVAL_MODE='hybrid'
+$env:NEXUS_OBSERVABILITY_ENABLED='true'
+docker compose -p nexusagent-stage2 -f backend/docker-compose.yml --profile search --profile observability up --build -d app postgres qdrant otel-collector jaeger prometheus grafana
+```
+
+Open [NexusAgent](http://127.0.0.1:8001/), [Grafana](http://127.0.0.1:3000/), [Jaeger](http://127.0.0.1:16686/) or [Prometheus](http://127.0.0.1:9090/). The app health response reports `storage=postgresql` and `retrieval=hybrid`.
+
+For the smaller lexical-only application and PostgreSQL:
+
 ```bash
 docker compose -p nexusagent-stage2 -f backend/docker-compose.yml up --build -d app
 ```
 
-Open [the local workspace](http://127.0.0.1:8000). Demo accounts:
+Open [the lexical-only workspace](http://127.0.0.1:8000). Demo accounts:
 
 - `alice` / `demo-alice-123`: O1001 (shipped), O1002 (processing).
 - `bob` / `demo-bob-123`: O2001 (processing).
 - `admin` / `demo-admin-123`: knowledge import, preview, publication and rollback.
 
-Compose explicitly enables the **deterministic rule demo**, so it does not require or call an external model. The UI labels this mode. PostgreSQL is exposed on loopback port `55432`; the application binds loopback port `8000`. Set `NEXUS_HTTP_PORT` before running Compose if that HTTP port is occupied.
+Compose explicitly enables the **deterministic rule demo**, so it does not require or call an external model. The UI labels this mode. PostgreSQL is exposed on loopback port `55432`; the smaller command uses application port `8000`, while the complete command above sets it to `8001`. Set `NEXUS_HTTP_PORT` to choose another port.
 
 Ask “O1002 能退款吗？”, then “帮我申请”. Refresh the page while the confirmation card is pending, approve it, and inspect the saved receipt. Repeated approvals return the same result. Existing seed records and receipts are not reset on startup.
 
@@ -128,20 +141,21 @@ The frozen Stage 3B evaluation contains 48 bilingual paraphrases and 32 unsuppor
 python backend/evaluate_hybrid.py --cache-dir backend/runtime/models
 ```
 
-The checked-in run achieved Hybrid Hit@3 95.8%, MRR@3 93.4% and 100% no-answer rejection on that synthetic set. The lexical mode intentionally scored 0% Hit@3 on these paraphrase-heavy cases while rejecting all negatives, making the comparison a hard regression set rather than a production-quality estimate. See [the Stage 3B acceptance record](docs/阶段3B-混合检索计划与验收.md) and [machine-readable report](docs/validation/stage3b-hybrid.json).
+The generated report achieved Hybrid Hit@3 95.8%, MRR@3 93.4% and 100% no-answer rejection on that synthetic set. The lexical mode intentionally scored 0% Hit@3 on these paraphrase-heavy cases while rejecting all negatives, making the comparison a hard regression set rather than a production-quality estimate. See [the Stage 3B acceptance record](docs/阶段3B-混合检索计划与验收.md) and [machine-readable report](docs/validation/stage3b-hybrid.json).
 
-With the demo server running at port 8000, run `npm run test:e2e` in `frontend/`. This uses installed Chrome and writes only to demo accounts. Build with `npm run build` to check TypeScript and generate frontend assets.
+With the complete demo running on port `8001`, run `$env:NEXUS_E2E_URL='http://127.0.0.1:8001'; npm --prefix frontend run test:e2e` from the repository root. This uses installed Chrome and writes only to demo accounts. Build with `npm --prefix frontend run build` to check TypeScript and generate frontend assets.
 
 ## P0 observability (opt-in)
 
-This slice adds OpenTelemetry request/node/retrieval/database spans, Prometheus RED and Agent metrics, and allowlisted JSON logs. It does not change approval, transaction, idempotency or checkpoint rules. No SSE or vector milestone is included.
+This slice adds OpenTelemetry request/node/retrieval/database spans, Prometheus RED and Agent metrics, and allowlisted JSON logs. It does not change approval, transaction, idempotency or checkpoint rules. P0 originally excluded SSE and vector retrieval; Stage 3B subsequently added the optional vector/hybrid path without changing the instrumentation boundary.
 
 From the repository root in PowerShell:
 
 ```powershell
 $env:NEXUS_HTTP_PORT='8001'
 $env:NEXUS_OBSERVABILITY_ENABLED='true'
-docker compose -p nexusagent-stage2 -f backend/docker-compose.yml --profile observability up --build -d app otel-collector jaeger prometheus grafana
+$env:NEXUS_RETRIEVAL_MODE='hybrid'
+docker compose -p nexusagent-stage2 -f backend/docker-compose.yml --profile observability --profile search up --build -d app postgres qdrant otel-collector jaeger prometheus grafana
 ```
 
 The app remains at http://127.0.0.1:8001; `/metrics` is exposed only when enabled. Open [Jaeger](http://127.0.0.1:16686) and select service `nexusagent`, [Prometheus targets](http://127.0.0.1:9090/targets), and [Grafana dashboard](http://127.0.0.1:3000/d/nexusagent-p0). Grafana's local demo login is `admin / nexus-local-demo`; set `NEXUS_GRAFANA_PASSWORD` before the first start to use another password. Existing Grafana volumes retain their previously initialized password.
@@ -166,6 +180,7 @@ Metrics use bounded labels; no user/conversation/turn/request/trace ID is a metr
 - `nexus_operations_total{category,operation,status}` and `nexus_operation_duration_seconds{category,operation}`: graph nodes and database/service/retrieval operation attempts. Approval interrupt is `waiting`, not `error`.
 - `nexus_agent_outcomes_total{action,outcome}`: completed/waiting/replay/error sends and decision outcomes, including rejected, expired and invalidated proposals.
 - `nexus_retrieval_total{outcome}`: found/no_match/error retrievals.
+- `nexus_retrieval_mode_total{requested_mode,used_mode,fallback}`: requested retrieval strategy, the strategy actually used and controlled vector-to-lexical fallback.
 
 Counters count attempts and response outcomes, **not unique refund transactions**; retries are explicitly counted. Database spans wrap business methods, including commit, rather than exporting individual SQL. This P0 uses one app worker and process-local counters (reset on restart). Multi-worker metrics aggregation, durable trace storage, log search and production alerting are outside this slice. Trace export uses a bounded asynchronous batch queue and a two-second exporter timeout; an unavailable Collector must not become a business dependency. Export failures can lose telemetry. Structured logs are available through `docker compose ... logs app`; no log storage service was added.
 
@@ -209,10 +224,12 @@ To demonstrate exporter independence, stop only Collector, send another policy q
 ```powershell
 python -m pytest backend/tests -q
 $env:NEXUS_TEST_DATABASE_URL='postgresql+psycopg://nexus:nexus_local@127.0.0.1:55432/nexus?connect_timeout=5'
-python -m pytest backend/tests/test_support.py backend/tests/test_knowledge.py backend/tests/test_observability.py -q
+python -m pytest backend/tests/test_support.py backend/tests/test_knowledge.py backend/tests/test_observability.py backend/tests/test_hybrid_retrieval.py -q
 Remove-Item Env:NEXUS_TEST_DATABASE_URL
 npm --prefix frontend run build
 ```
+
+The latest Stage 3B verification completed with 80 backend tests passed and one opt-in live-model test skipped; the PostgreSQL-focused selection completed with 52 passed and one skipped. Ruff, the frontend production build, Compose configuration, real hybrid queries, Qdrant outage fallback and recovery also passed. These are synthetic/local portfolio checks rather than production load certification.
 
 Observability tests use in-memory span exporters and per-app Prometheus registries; they require no Collector, Jaeger, Prometheus, Grafana or model service. They cover trace parentage, request isolation, RED labels, sensitive input/exception exclusion, normal interrupt, explicit decision/replay, fault recovery, logging sink failure, default-off behavior and independent app registries. PostgreSQL tests use random schemas; use a dedicated test database in shared environments. See [P0 acceptance record](docs/P0-可观测性验收.md) for the actual run results and limitations.
 
@@ -227,6 +244,7 @@ Stage 3A delivers versioned knowledge ingestion and a lexical evaluation baselin
 - [Current progress](docs/PROGRESS.md)
 - [Deployment and acceptance walkthrough](docs/阶段2-验收与部署.md)
 - [Stage 3A plan, acceptance results and walkthrough](docs/阶段3A-计划与验收.md)
+- [Stage 3B hybrid retrieval plan and acceptance](docs/阶段3B-混合检索计划与验收.md)
 - [Target-state project/resume material](docs/NexusAgent-项目完成形态与简历素材.md)
 
 MIT license; see [LICENSE](LICENSE).
